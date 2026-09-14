@@ -5,7 +5,6 @@ venv/
 env/
 .venv/
 
-db.sqlite3
 *.log
 
 .env
