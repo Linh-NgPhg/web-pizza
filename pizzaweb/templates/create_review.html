@@ -1,0 +1,834 @@
+{% extends "base.html" %}
+
+{% block title %}
+Đánh giá Pizza - Pizza House
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .review-page {
+        min-height: calc(100vh - 80px);
+        padding: 55px 20px;
+
+        background:
+            radial-gradient(
+                circle at top left,
+                rgba(255, 107, 53, 0.10),
+                transparent 35%
+            ),
+            #f8f9fb;
+    }
+
+    .review-container {
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .review-card {
+        background: #ffffff;
+
+        border-radius: 24px;
+
+        padding: 35px;
+
+        box-shadow:
+            0 12px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .review-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        margin-bottom: 25px;
+
+        color: #666;
+
+        text-decoration: none;
+
+        font-size: 14px;
+        font-weight: 600;
+
+        transition: 0.2s;
+    }
+
+    .review-back:hover {
+        color: #ff6b35;
+    }
+
+    /* ==================================================
+       HEADING
+    ================================================== */
+
+    .review-heading {
+        text-align: center;
+
+        margin-bottom: 30px;
+    }
+
+    .review-heading-icon {
+        width: 72px;
+        height: 72px;
+
+        margin: 0 auto 15px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: #fff3ed;
+
+        font-size: 34px;
+    }
+
+    .review-heading h1 {
+        margin: 0 0 8px;
+
+        color: #222;
+
+        font-size: 28px;
+    }
+
+    .review-heading p {
+        margin: 0;
+
+        color: #777;
+
+        font-size: 14px;
+    }
+
+    /* ==================================================
+       PIZZA INFO
+    ================================================== */
+
+    .pizza-info {
+        display: flex;
+        align-items: center;
+
+        gap: 18px;
+
+        padding: 18px;
+
+        margin-bottom: 28px;
+
+        background: #fafafa;
+
+        border: 1px solid #eeeeee;
+
+        border-radius: 16px;
+    }
+
+    .pizza-image {
+        width: 80px;
+        height: 80px;
+
+        flex-shrink: 0;
+
+        border-radius: 14px;
+
+        overflow: hidden;
+
+        background: #eeeeee;
+    }
+
+    .pizza-image img {
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+    }
+
+    .pizza-info-text h3 {
+        margin: 0 0 6px;
+
+        color: #222;
+
+        font-size: 18px;
+    }
+
+    .pizza-info-text p {
+        margin: 0;
+
+        color: #777;
+
+        font-size: 14px;
+    }
+
+    /* ==================================================
+       FORM
+    ================================================== */
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-label {
+        display: block;
+
+        margin-bottom: 9px;
+
+        color: #333;
+
+        font-size: 14px;
+
+        font-weight: 700;
+    }
+
+    .form-input {
+        width: 100%;
+
+        box-sizing: border-box;
+
+        padding: 13px 15px;
+
+        border: 1px solid #dddddd;
+
+        border-radius: 12px;
+
+        background: #ffffff;
+
+        color: #333;
+
+        font-family: inherit;
+
+        font-size: 14px;
+
+        outline: none;
+
+        transition: 0.2s;
+    }
+
+    .form-input:focus {
+        border-color: #ff6b35;
+
+        box-shadow:
+            0 0 0 3px rgba(255, 107, 53, 0.10);
+    }
+
+    textarea.form-input {
+        resize: vertical;
+
+        min-height: 120px;
+    }
+
+    /* ==================================================
+       STAR RATING
+    ================================================== */
+
+    .star-rating {
+        display: flex;
+
+        align-items: center;
+
+        gap: 4px;
+
+        margin-top: 5px;
+    }
+
+    .star {
+        width: 46px;
+        height: 46px;
+
+        padding: 0;
+
+        border: none;
+
+        background: transparent;
+
+        color: #d5d5d5;
+
+        font-size: 40px;
+
+        line-height: 1;
+
+        cursor: pointer;
+
+        transition:
+            color 0.15s ease,
+            transform 0.15s ease;
+    }
+
+    .star:hover {
+        transform: scale(1.12);
+    }
+
+    .star.active {
+        color: #ffc107;
+    }
+
+    .star:focus {
+        outline: none;
+    }
+
+    .star:focus-visible {
+        outline: 2px solid #ff6b35;
+
+        outline-offset: 3px;
+
+        border-radius: 6px;
+    }
+
+    /* ==================================================
+       ERROR
+    ================================================== */
+
+    .field-error {
+        margin-top: 7px;
+
+        color: #dc3545;
+
+        font-size: 13px;
+    }
+
+    .form-error {
+        margin-bottom: 20px;
+
+        padding: 12px 15px;
+
+        border-radius: 10px;
+
+        background: #fff0f0;
+
+        border: 1px solid #ffd0d0;
+
+        color: #dc3545;
+
+        font-size: 13px;
+    }
+
+    /* ==================================================
+       NOTE
+    ================================================== */
+
+    .review-note {
+        margin-top: 20px;
+
+        padding: 12px 15px;
+
+        border-radius: 10px;
+
+        background: #fff8e8;
+
+        border: 1px solid #ffe3a8;
+
+        color: #7a5a00;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+    }
+
+    /* ==================================================
+       BUTTONS
+    ================================================== */
+
+    .review-actions {
+        display: flex;
+
+        gap: 12px;
+
+        margin-top: 30px;
+    }
+
+    .btn {
+        flex: 1;
+
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        min-height: 48px;
+
+        border-radius: 12px;
+
+        font-family: inherit;
+
+        font-size: 14px;
+
+        font-weight: 700;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+    }
+
+    .btn-cancel {
+        background: #f3f3f3;
+
+        color: #555;
+
+        border: 1px solid #e3e3e3;
+    }
+
+    .btn-cancel:hover {
+        background: #e9e9e9;
+    }
+
+    .btn-submit {
+        border: none;
+
+        background: #ff6b35;
+
+        color: #ffffff;
+
+        box-shadow:
+            0 6px 18px rgba(255, 107, 53, 0.22);
+    }
+
+    .btn-submit:hover {
+        background: #e85b28;
+
+        transform: translateY(-1px);
+    }
+
+    /* ==================================================
+       RESPONSIVE
+    ================================================== */
+
+    @media (max-width: 600px) {
+
+        .review-page {
+            padding: 30px 15px;
+        }
+
+        .review-card {
+            padding: 25px 20px;
+
+            border-radius: 18px;
+        }
+
+        .review-heading h1 {
+            font-size: 24px;
+        }
+
+        .pizza-info {
+            gap: 12px;
+        }
+
+        .pizza-image {
+            width: 65px;
+            height: 65px;
+        }
+
+        .star {
+            width: 40px;
+            height: 40px;
+
+            font-size: 35px;
+        }
+
+        .review-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+
+<div class="review-page">
+
+    <div class="review-container">
+
+        <!-- ==================================================
+             QUAY LẠI
+        ================================================== -->
+
+        <a
+            href="{% url 'order_detail' order.id %}"
+            class="review-back"
+        >
+            ← Quay lại chi tiết đơn hàng
+        </a>
+
+
+        <div class="review-card">
+
+            <!-- ==================================================
+                 TIÊU ĐỀ
+            ================================================== -->
+
+            <div class="review-heading">
+
+                <div class="review-heading-icon">
+                    ⭐
+                </div>
+
+                <h1>
+                    Đánh giá Pizza
+                </h1>
+
+                <p>
+                    Hãy chia sẻ cảm nhận của bạn về món Pizza này
+                </p>
+
+            </div>
+
+
+            <!-- ==================================================
+                 THÔNG TIN PIZZA
+            ================================================== -->
+
+            <div class="pizza-info">
+
+                <div class="pizza-image">
+
+                    {% if order_item.pizza.image %}
+
+                        <img
+                            src="{{ order_item.pizza.image.url }}"
+                            alt="{{ order_item.pizza.name }}"
+                        >
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="pizza-info-text">
+
+                    <h3>
+                        {{ order_item.pizza.name }}
+                    </h3>
+
+                    <p>
+                        Số lượng:
+                        {{ order_item.quantity }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 FORM
+            ================================================== -->
+
+            <form
+                method="POST"
+                action=""
+            >
+
+                {% csrf_token %}
+
+
+                {% if form.non_field_errors %}
+
+                    <div class="form-error">
+                        {{ form.non_field_errors }}
+                    </div>
+
+                {% endif %}
+
+
+                <!-- ==================================================
+                     RATING
+                ================================================== -->
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        ⭐ Đánh giá
+                    </label>
+
+
+                    <div
+                        class="star-rating"
+                        id="starRating"
+                    >
+
+                        <button
+                            type="button"
+                            class="star"
+                            data-value="1"
+                            aria-label="1 sao"
+                        >☆</button>
+
+                        <button
+                            type="button"
+                            class="star"
+                            data-value="2"
+                            aria-label="2 sao"
+                        >☆</button>
+
+                        <button
+                            type="button"
+                            class="star"
+                            data-value="3"
+                            aria-label="3 sao"
+                        >☆</button>
+
+                        <button
+                            type="button"
+                            class="star"
+                            data-value="4"
+                            aria-label="4 sao"
+                        >☆</button>
+
+                        <button
+                            type="button"
+                            class="star"
+                            data-value="5"
+                            aria-label="5 sao"
+                        >☆</button>
+
+                    </div>
+
+
+                    {{ form.rating }}
+
+
+                    {% if form.rating.errors %}
+
+                        <div class="field-error">
+                            {{ form.rating.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ==================================================
+                     COMMENT
+                ================================================== -->
+
+                <div class="form-group">
+
+                    <label
+                        for="{{ form.comment.id_for_label }}"
+                        class="form-label"
+                    >
+                        💬 Nhận xét
+                    </label>
+
+
+                    {{ form.comment }}
+
+
+                    {% if form.comment.errors %}
+
+                        <div class="field-error">
+                            {{ form.comment.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ==================================================
+                     NOTE
+                ================================================== -->
+
+                <div class="review-note">
+
+                    💡 Bạn có thể chỉnh sửa hoặc xóa đánh giá tối đa
+                    <strong>1 lần</strong> trong vòng
+                    <strong>3 ngày</strong> kể từ lúc đánh giá.
+
+                </div>
+
+
+                <!-- ==================================================
+                     BUTTONS
+                ================================================== -->
+
+                <div class="review-actions">
+
+                    <a
+                        href="{% url 'order_detail' order.id %}"
+                        class="btn btn-cancel"
+                    >
+                        Hủy
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-submit"
+                    >
+                        ⭐ Gửi đánh giá
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==================================================
+     STAR JAVASCRIPT
+================================================== -->
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const stars =
+                document.querySelectorAll(".star");
+
+            const ratingInput =
+                document.getElementById("id_rating");
+
+            const starRating =
+                document.getElementById("starRating");
+
+
+            if (!ratingInput || !starRating) {
+                return;
+            }
+
+
+            // ==================================================
+            // CẬP NHẬT SAO
+            // ==================================================
+
+            function updateStars(value) {
+
+                stars.forEach(function (star) {
+
+                    const starValue =
+                        parseInt(
+                            star.dataset.value,
+                            10
+                        );
+
+
+                    if (starValue <= value) {
+
+                        star.textContent = "★";
+
+                        star.classList.add("active");
+
+                    } else {
+
+                        star.textContent = "☆";
+
+                        star.classList.remove("active");
+
+                    }
+
+                });
+
+            }
+
+
+            // ==================================================
+            // CLICK CHỌN SAO
+            // ==================================================
+
+            stars.forEach(function (star) {
+
+                star.addEventListener(
+                    "click",
+                    function () {
+
+                        const value =
+                            parseInt(
+                                this.dataset.value,
+                                10
+                            );
+
+
+                        ratingInput.value = value;
+
+                        updateStars(value);
+
+                    }
+                );
+
+
+                // ==================================================
+                // HOVER
+                // ==================================================
+
+                star.addEventListener(
+                    "mouseenter",
+                    function () {
+
+                        const value =
+                            parseInt(
+                                this.dataset.value,
+                                10
+                            );
+
+
+                        stars.forEach(function (item) {
+
+                            const itemValue =
+                                parseInt(
+                                    item.dataset.value,
+                                    10
+                                );
+
+
+                            if (itemValue <= value) {
+
+                                item.textContent = "★";
+
+                            } else {
+
+                                item.textContent = "☆";
+
+                            }
+
+                        });
+
+                    }
+                );
+
+            });
+
+
+            // ==================================================
+            // RỜI CHUỘT
+            // ==================================================
+
+            starRating.addEventListener(
+                "mouseleave",
+                function () {
+
+                    const currentValue =
+                        parseInt(
+                            ratingInput.value || 0,
+                            10
+                        );
+
+
+                    updateStars(currentValue);
+
+                }
+            );
+
+
+            // ==================================================
+            // TRẠNG THÁI BAN ĐẦU
+            // ==================================================
+
+            updateStars(
+                parseInt(
+                    ratingInput.value || 0,
+                    10
+                )
+            );
+
+        }
+    );
+
+</script>
+
+{% endblock %}

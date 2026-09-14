@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard quản trị{% endblock %}
+
+{% block content %}
+
+<style>
+    .dash-page {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px 60px;
+    }
+
+    .dash-header h1 {
+        margin: 0 0 6px;
+        font-size: 28px;
+        color: #252525;
+    }
+
+    .dash-header p {
+        margin: 0 0 25px;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .dash-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+        margin-bottom: 30px;
+    }
+
+    .dash-card {
+        background: white;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, .06);
+        border: 1px solid #f1f1f1;
+    }
+
+    .dash-card .label {
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 8px;
+    }
+
+    .dash-card .value {
+        font-size: 26px;
+        font-weight: 800;
+        color: #252525;
+    }
+
+    .dash-sections {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+        .dash-sections {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .dash-section {
+        background: white;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, .06);
+        border: 1px solid #f1f1f1;
+    }
+
+    .dash-section h2 {
+        margin: 0 0 16px;
+        font-size: 18px;
+        color: #252525;
+    }
+
+    .dash-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f2f2f2;
+        font-size: 14px;
+    }
+
+    .dash-row:last-child {
+        border-bottom: none;
+    }
+
+    .low-stock {
+        color: #e85d04;
+        font-weight: 700;
+    }
+
+    .empty-note {
+        color: #999;
+        font-size: 14px;
+        padding: 10px 0;
+    }
+</style>
+
+<div class="dash-page">
+
+    <div class="dash-header">
+        <h1>📊 Dashboard quản trị</h1>
+        <p>Tổng quan hoạt động kinh doanh của Pizza House</p>
+    </div>
+
+    <div class="dash-cards">
+
+        <div class="dash-card">
+            <div class="label">Tổng doanh thu</div>
+            <div class="value">{{ total_revenue|floatformat:0 }} ₫</div>
+        </div>
+
+        <div class="dash-card">
+            <div class="label">Tổng số đơn hàng</div>
+            <div class="value">{{ total_orders }}</div>
+        </div>
+
+        <div class="dash-card">
+            <div class="label">Tổng số khách hàng</div>
+            <div class="value">{{ total_customers }}</div>
+        </div>
+
+        <div class="dash-card">
+            <div class="label">Đơn đang xử lý</div>
+            <div class="value">{{ pending_orders }}</div>
+        </div>
+
+    </div>
+
+    <div class="dash-sections">
+
+        <div class="dash-section">
+            <h2>🍕 Top pizza bán chạy</h2>
+
+            {% for item in top_pizzas %}
+
+                <div class="dash-row">
+                    <span>{{ item.pizza__name }}</span>
+                    <span>{{ item.total_quantity }} phần</span>
+                </div>
+
+            {% empty %}
+
+                <div class="empty-note">Chưa có dữ liệu bán hàng.</div>
+
+            {% endfor %}
+        </div>
+
+        <div class="dash-section">
+            <h2>⚠️ Cảnh báo tồn kho thấp</h2>
+
+            {% for item in low_stock_items %}
+
+                <div class="dash-row">
+                    <span>{{ item.ingredient }}</span>
+                    <span class="low-stock">
+                        {{ item.quantity }} / {{ item.min_quantity }} {{ item.unit }}
+                    </span>
+                </div>
+
+            {% empty %}
+
+                <div class="empty-note">Tồn kho đang ở mức an toàn.</div>
+
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="dash-section" style="margin-top:20px;">
+        <h2>🧾 Đơn hàng gần đây</h2>
+
+        {% for order in recent_orders %}
+
+            <div class="dash-row">
+                <span>#{{ order.id }} - {{ order.user.username }}</span>
+                <span>{{ order.total_price|floatformat:0 }} ₫ &middot; {{ order.get_status_display }}</span>
+            </div>
+
+        {% empty %}
+
+            <div class="empty-note">Chưa có đơn hàng nào.</div>
+
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

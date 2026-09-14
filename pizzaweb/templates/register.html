@@ -1,0 +1,705 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* ================================
+       FONT TIẾNG VIỆT
+    ================================= */
+    .register-page,
+    .register-page * {
+        font-family: "Be Vietnam Pro", Arial, sans-serif;
+        box-sizing: border-box;
+    }
+
+    /* ================================
+       BACKGROUND
+    ================================= */
+    .register-page {
+        min-height: calc(100vh - 80px);
+        background:
+            radial-gradient(
+                circle at 10% 20%,
+                rgba(220, 53, 69, 0.08),
+                transparent 25%
+            ),
+            radial-gradient(
+                circle at 90% 80%,
+                rgba(255, 193, 7, 0.10),
+                transparent 25%
+            ),
+            #fff8f5;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 50px 15px;
+    }
+
+    /* ================================
+       CARD
+    ================================= */
+    .register-card {
+        width: 100%;
+        max-width: 480px;
+
+        background: #fff;
+
+        border-radius: 28px;
+        overflow: hidden;
+
+        border: 1px solid rgba(0, 0, 0, 0.05);
+
+        box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.10),
+            0 5px 15px rgba(220, 53, 69, 0.05);
+    }
+
+    /* ================================
+       HEADER
+    ================================= */
+    .register-header {
+        position: relative;
+
+        background: linear-gradient(
+            135deg,
+            #dc3545,
+            #b91c2c
+        );
+
+        color: #fff;
+
+        text-align: center;
+
+        padding: 38px 25px 32px;
+
+        overflow: hidden;
+    }
+
+    .register-header::before {
+        content: "";
+
+        position: absolute;
+
+        width: 180px;
+        height: 180px;
+
+        background: rgba(255,255,255,0.08);
+
+        border-radius: 50%;
+
+        top: -90px;
+        right: -50px;
+    }
+
+    .register-header::after {
+        content: "";
+
+        position: absolute;
+
+        width: 120px;
+        height: 120px;
+
+        background: rgba(255,255,255,0.06);
+
+        border-radius: 50%;
+
+        bottom: -70px;
+        left: -30px;
+    }
+
+    /* ================================
+       PIZZA LOGO
+    ================================= */
+    .pizza-logo {
+        position: relative;
+        z-index: 2;
+
+        width: 72px;
+        height: 72px;
+
+        margin: 0 auto 15px;
+
+        background: rgba(255,255,255,0.18);
+
+        border: 1px solid rgba(255,255,255,0.3);
+
+        border-radius: 22px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-family: Arial, sans-serif !important;
+        font-size: 38px;
+
+        box-shadow:
+            0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    /* ================================
+       TITLE
+    ================================= */
+    .register-header h2 {
+        position: relative;
+        z-index: 2;
+
+        margin: 0 0 7px;
+
+        font-family:
+            "Be Vietnam Pro",
+            Arial,
+            sans-serif !important;
+
+        font-size: 28px;
+
+        font-weight: 800;
+
+        line-height: 1.3;
+
+        letter-spacing: -0.5px;
+
+        color: #fff;
+    }
+
+    .register-header p {
+        position: relative;
+        z-index: 2;
+
+        margin: 0;
+
+        font-family:
+            "Be Vietnam Pro",
+            Arial,
+            sans-serif !important;
+
+        color: rgba(255,255,255,0.88);
+
+        font-size: 13px;
+
+        line-height: 1.6;
+    }
+
+    /* ================================
+       BODY
+    ================================= */
+    .register-body {
+        padding: 32px 36px 30px;
+
+        background: #fff;
+    }
+
+    /* ================================
+       ERROR
+    ================================= */
+    .register-error {
+        background: #fff1f2;
+
+        border: 1px solid #fecdd3;
+
+        color: #9f1239;
+
+        border-radius: 14px;
+
+        padding: 12px 15px;
+
+        font-size: 12px;
+
+        line-height: 1.6;
+
+        margin-bottom: 22px;
+    }
+
+    .register-error strong {
+        display: block;
+
+        margin-bottom: 5px;
+
+        font-weight: 700;
+    }
+
+    .register-error ul {
+        margin: 0;
+
+        padding-left: 18px;
+    }
+
+    /* ================================
+       FORM
+    ================================= */
+    .form-group-custom {
+        margin-bottom: 19px;
+    }
+
+    .form-label-custom {
+        display: block;
+
+        font-family:
+            "Be Vietnam Pro",
+            Arial,
+            sans-serif !important;
+
+        font-size: 13px;
+
+        font-weight: 700;
+
+        color: #343a40;
+
+        margin-bottom: 8px;
+    }
+
+    /* ================================
+       INPUT
+    ================================= */
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+
+        left: 15px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        color: #9ca3af;
+
+        font-size: 14px;
+
+        z-index: 3;
+
+        transition: 0.25s;
+    }
+
+    .custom-input {
+        width: 100%;
+
+        height: 50px;
+
+        border: 1.5px solid #e5e7eb;
+
+        border-radius: 14px;
+
+        background: #fafafa;
+
+        padding: 0 15px 0 44px;
+
+        font-family:
+            "Be Vietnam Pro",
+            Arial,
+            sans-serif !important;
+
+        font-size: 13px;
+
+        color: #212529;
+
+        outline: none;
+
+        transition: all 0.25s ease;
+    }
+
+    .custom-input::placeholder {
+        color: #adb5bd;
+
+        font-family:
+            "Be Vietnam Pro",
+            Arial,
+            sans-serif !important;
+    }
+
+    .custom-input:hover {
+        border-color: #d1d5db;
+
+        background: #fff;
+    }
+
+    .custom-input:focus {
+        background: #fff;
+
+        border-color: #dc3545;
+
+        box-shadow:
+            0 0 0 4px rgba(220, 53, 69, 0.10);
+    }
+
+    .input-wrapper:focus-within .input-icon {
+        color: #dc3545;
+    }
+
+    /* ================================
+       PASSWORD NOTE
+    ================================= */
+    .password-note {
+        display: flex;
+
+        align-items: center;
+
+        gap: 6px;
+
+        color: #8a8f98;
+
+        font-size: 11px;
+
+        line-height: 1.5;
+
+        margin-top: 8px;
+    }
+
+    .password-note i {
+        color: #dc3545;
+
+        font-size: 10px;
+    }
+
+    /* ================================
+       BUTTON
+    ================================= */
+    .register-button {
+        width: 100%;
+
+        height: 52px;
+
+        border: none;
+
+        border-radius: 14px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #dc3545,
+                #c82333
+            );
+
+        color: #fff;
+
+        font-family:
+            "Be Vietnam Pro",
+            Arial,
+            sans-serif !important;
+
+        font-size: 13px;
+
+        font-weight: 800;
+
+        letter-spacing: 0.4px;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 8px 18px rgba(220, 53, 69, 0.25);
+
+        transition: all 0.25s ease;
+
+        margin-top: 7px;
+    }
+
+    .register-button:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 12px 25px rgba(220, 53, 69, 0.32);
+
+        background:
+            linear-gradient(
+                135deg,
+                #e03b4d,
+                #b91c2c
+            );
+    }
+
+    .register-button:active {
+        transform: translateY(0);
+    }
+
+    .register-button i {
+        margin-right: 7px;
+    }
+
+    /* ================================
+       LOGIN
+    ================================= */
+    .login-area {
+        text-align: center;
+
+        border-top: 1px solid #f0f0f0;
+
+        margin-top: 27px;
+
+        padding-top: 22px;
+
+        font-size: 12px;
+    }
+
+    .login-area span {
+        color: #8a8f98;
+
+        font-family:
+            "Be Vietnam Pro",
+            Arial,
+            sans-serif !important;
+    }
+
+    .login-link {
+        color: #dc3545;
+
+        font-weight: 700;
+
+        text-decoration: none;
+
+        margin-left: 5px;
+
+        transition: 0.2s;
+    }
+
+    .login-link:hover {
+        color: #a71d2a;
+
+        text-decoration: underline;
+    }
+
+    /* ================================
+       MOBILE
+    ================================= */
+    @media (max-width: 576px) {
+
+        .register-page {
+            min-height: 100vh;
+
+            padding: 25px 12px;
+        }
+
+        .register-card {
+            border-radius: 22px;
+        }
+
+        .register-header {
+            padding: 30px 20px 27px;
+        }
+
+        .register-header h2 {
+            font-size: 24px;
+        }
+
+        .register-header p {
+            font-size: 12px;
+        }
+
+        .register-body {
+            padding: 27px 22px 25px;
+        }
+
+        .pizza-logo {
+            width: 62px;
+            height: 62px;
+
+            font-size: 32px;
+        }
+    }
+</style>
+
+
+<div class="register-page">
+
+    <div class="register-card">
+
+        <!-- HEADER -->
+        <div class="register-header">
+
+            <div class="pizza-logo">
+                🍕
+            </div>
+
+            <h2>Tạo tài khoản</h2>
+
+            <p>
+                Gia nhập Pizza House để nhận thật nhiều ưu đãi!
+            </p>
+
+        </div>
+
+
+        <!-- BODY -->
+        <div class="register-body">
+
+            {% if form.errors %}
+
+                <div class="register-error">
+
+                    <strong>
+                        <i class="bi bi-exclamation-circle"></i>
+                        Đã có lỗi xảy ra
+                    </strong>
+
+                    <ul>
+
+                        {% for field in form %}
+
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+
+                        {% endfor %}
+
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+
+                    </ul>
+
+                </div>
+
+            {% endif %}
+
+
+            <form method="post" novalidate>
+
+                {% csrf_token %}
+
+
+                <!-- USERNAME -->
+                <div class="form-group-custom">
+
+                    <label class="form-label-custom">
+                        Tên đăng nhập
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <input
+                            type="text"
+                            name="username"
+                            class="custom-input"
+                            placeholder="Nhập tên đăng nhập"
+                            required
+                            value="{{ form.username.value|default:'' }}"
+                        >
+
+                        <i class="bi bi-person input-icon"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EMAIL -->
+                <div class="form-group-custom">
+
+                    <label class="form-label-custom">
+                        Địa chỉ Email
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <input
+                            type="email"
+                            name="email"
+                            class="custom-input"
+                            placeholder="name@example.com"
+                            value="{{ form.email.value|default:'' }}"
+                        >
+
+                        <i class="bi bi-envelope input-icon"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PASSWORD -->
+                <div class="form-group-custom">
+
+                    <label class="form-label-custom">
+                        Mật khẩu
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <input
+                            type="password"
+                            name="password1"
+                            class="custom-input"
+                            placeholder="Nhập mật khẩu"
+                            required
+                        >
+
+                        <i class="bi bi-lock input-icon"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONFIRM PASSWORD -->
+                <div class="form-group-custom">
+
+                    <label class="form-label-custom">
+                        Xác nhận mật khẩu
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <input
+                            type="password"
+                            name="password2"
+                            class="custom-input"
+                            placeholder="Nhập lại mật khẩu"
+                            required
+                        >
+
+                        <i class="bi bi-shield-check input-icon"></i>
+
+                    </div>
+
+                    <div class="password-note">
+
+                        <i class="bi bi-info-circle"></i>
+
+                        Mật khẩu nên có ít nhất 8 ký tự và không quá đơn giản.
+
+                    </div>
+
+                </div>
+
+
+                <!-- BUTTON -->
+                <button
+                    type="submit"
+                    class="register-button"
+                >
+
+                    <i class="bi bi-person-plus"></i>
+
+                    ĐĂNG KÝ NGAY
+
+                </button>
+
+            </form>
+
+
+            <!-- LOGIN -->
+            <div class="login-area">
+
+                <span>
+                    Đã có tài khoản?
+                </span>
+
+                <a
+                    href="{% url 'login' %}"
+                    class="login-link"
+                >
+                    Đăng nhập
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

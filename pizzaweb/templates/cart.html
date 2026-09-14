@@ -1,0 +1,900 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Giỏ hàng - Pizza House
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================
+   CART PAGE
+========================================= */
+
+.cart-page {
+    padding: 55px 0 70px;
+    background: #fafafa;
+    min-height: 80vh;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.cart-header {
+    text-align: center;
+    margin-bottom: 45px;
+}
+
+.cart-header h1 {
+    margin: 0;
+    font-size: 36px;
+    font-weight: 800;
+    color: #222;
+}
+
+.cart-header h1 span {
+    color: #e53935;
+}
+
+.cart-header p {
+    margin-top: 10px;
+    color: #777;
+    font-size: 16px;
+}
+
+
+/* =========================================
+   LAYOUT
+========================================= */
+
+.cart-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 28px;
+    align-items: start;
+}
+
+
+/* =========================================
+   CART LIST
+========================================= */
+
+.cart-list {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #eeeeee;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =========================================
+   CART ITEM
+========================================= */
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 115px minmax(0, 1fr) auto auto;
+    gap: 22px;
+    align-items: center;
+
+    padding: 24px;
+
+    border-bottom: 1px solid #eeeeee;
+
+    transition: background 0.2s ease;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item:hover {
+    background: #fffdfb;
+}
+
+
+/* =========================================
+   IMAGE
+========================================= */
+
+.cart-image {
+    width: 115px;
+    height: 100px;
+
+    border-radius: 16px;
+
+    object-fit: cover;
+
+    display: block;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
+}
+
+.cart-no-image {
+    width: 115px;
+    height: 100px;
+
+    border-radius: 16px;
+
+    background: #fff3e0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 42px;
+}
+
+
+/* =========================================
+   PRODUCT INFO
+========================================= */
+
+.cart-product-name {
+    margin: 0 0 7px;
+
+    font-size: 18px;
+    font-weight: 750;
+
+    color: #222;
+}
+
+.cart-product-description {
+    margin: 0 0 10px;
+
+    color: #888;
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+.cart-product-price {
+    font-size: 16px;
+    font-weight: 700;
+
+    color: #e53935;
+}
+
+
+/* =========================================
+   QUANTITY
+========================================= */
+
+.quantity-box {
+    display: flex;
+    align-items: center;
+
+    border: 1px solid #e3e3e3;
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    background: #fff;
+}
+
+.quantity-btn {
+    width: 38px;
+    height: 38px;
+
+    border: none;
+    background: #fff;
+
+    color: #444;
+
+    font-size: 20px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 0.2s ease;
+}
+
+.quantity-btn:hover {
+    background: #fff0ed;
+    color: #e53935;
+}
+
+.quantity-number {
+    min-width: 40px;
+
+    text-align: center;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    color: #222;
+}
+
+
+/* =========================================
+   SUBTOTAL
+========================================= */
+
+.cart-subtotal {
+    min-width: 115px;
+
+    text-align: right;
+}
+
+.cart-subtotal-price {
+    margin-bottom: 9px;
+
+    font-size: 17px;
+    font-weight: 800;
+
+    color: #e53935;
+}
+
+
+/* =========================================
+   DELETE BUTTON
+========================================= */
+
+.delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: transparent;
+
+    color: #999;
+
+    font-size: 13px;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: color 0.2s ease;
+}
+
+.delete-btn:hover {
+    color: #e53935;
+}
+
+
+/* =========================================
+   CONTINUE SHOPPING
+========================================= */
+
+.continue-shopping {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 20px;
+
+    padding: 12px 20px;
+
+    border: 1px solid #e53935;
+    border-radius: 12px;
+
+    background: #fff;
+
+    color: #e53935;
+
+    font-weight: 700;
+    font-size: 14px;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.continue-shopping:hover {
+    background: #e53935;
+    color: #fff;
+}
+
+
+/* =========================================
+   ORDER SUMMARY
+========================================= */
+
+.order-summary {
+    position: sticky;
+    top: 25px;
+
+    background: #fff;
+
+    border-radius: 20px;
+
+    padding: 28px;
+
+    border: 1px solid #eeeeee;
+
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+}
+
+.summary-title {
+    margin: 0 0 25px;
+
+    font-size: 21px;
+    font-weight: 800;
+
+    color: #222;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 17px;
+
+    font-size: 15px;
+}
+
+.summary-label {
+    color: #777;
+}
+
+.summary-value {
+    font-weight: 700;
+    color: #333;
+}
+
+.summary-free {
+    color: #28a745;
+    font-weight: 700;
+}
+
+.summary-divider {
+    height: 1px;
+
+    border: none;
+
+    background: #eeeeee;
+
+    margin: 22px 0;
+}
+
+.summary-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 24px;
+}
+
+.summary-total-label {
+    font-size: 18px;
+    font-weight: 800;
+
+    color: #222;
+}
+
+.summary-total-price {
+    font-size: 24px;
+    font-weight: 850;
+
+    color: #e53935;
+}
+
+
+/* =========================================
+   CHECKOUT BUTTON
+========================================= */
+
+.checkout-btn {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 15px 20px;
+
+    border: none;
+    border-radius: 13px;
+
+    background: #e53935;
+
+    color: #fff;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    box-shadow: 0 6px 18px rgba(229, 57, 53, 0.25);
+
+    transition: all 0.25s ease;
+}
+
+.checkout-btn:hover {
+    background: #d32f2f;
+    color: #fff;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 9px 22px rgba(229, 57, 53, 0.32);
+}
+
+.login-note {
+    margin: 12px 0 0;
+
+    text-align: center;
+
+    color: #888;
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   EMPTY CART
+========================================= */
+
+.empty-cart {
+    max-width: 600px;
+
+    margin: 20px auto 0;
+
+    padding: 55px 35px;
+
+    background: #fff;
+
+    border: 1px solid #eeeeee;
+
+    border-radius: 22px;
+
+    text-align: center;
+
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.empty-cart-icon {
+    width: 95px;
+    height: 95px;
+
+    margin: 0 auto 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fff3e0;
+
+    font-size: 48px;
+}
+
+.empty-cart h2 {
+    margin: 0 0 10px;
+
+    font-size: 25px;
+    font-weight: 800;
+
+    color: #222;
+}
+
+.empty-cart p {
+    max-width: 420px;
+
+    margin: 0 auto 25px;
+
+    color: #888;
+
+    line-height: 1.6;
+}
+
+.menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 13px 25px;
+
+    border-radius: 12px;
+
+    background: #e53935;
+    color: #fff;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    box-shadow: 0 5px 16px rgba(229, 57, 53, 0.22);
+
+    transition: all 0.2s ease;
+}
+
+.menu-btn:hover {
+    background: #d32f2f;
+    color: #fff;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+
+    .cart-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .order-summary {
+        position: static;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .cart-page {
+        padding: 35px 15px 50px;
+    }
+
+    .cart-header {
+        margin-bottom: 30px;
+    }
+
+    .cart-header h1 {
+        font-size: 29px;
+    }
+
+    .cart-item {
+        grid-template-columns: 85px minmax(0, 1fr);
+
+        gap: 15px;
+
+        padding: 18px;
+    }
+
+    .cart-image,
+    .cart-no-image {
+        width: 85px;
+        height: 80px;
+    }
+
+    .cart-no-image {
+        font-size: 32px;
+    }
+
+    .cart-product-name {
+        font-size: 16px;
+    }
+
+    .cart-product-description {
+        font-size: 13px;
+    }
+
+    .quantity-box {
+        grid-column: 2;
+        width: fit-content;
+    }
+
+    .cart-subtotal {
+        grid-column: 2;
+
+        text-align: left;
+    }
+
+    .cart-subtotal-price {
+        display: inline-block;
+
+        margin-right: 15px;
+    }
+
+    .order-summary {
+        padding: 22px;
+    }
+
+}
+
+</style>
+
+
+<div class="cart-page">
+
+    <div class="container">
+
+        <!-- =================================
+             HEADER
+        ================================== -->
+
+        <div class="cart-header">
+
+            <h1>
+                🛒 <span>Giỏ hàng</span>
+            </h1>
+
+            <p>
+                Kiểm tra sản phẩm trước khi đặt hàng
+            </p>
+
+        </div>
+
+
+        {% if items %}
+
+        <!-- =================================
+             CART LAYOUT
+        ================================== -->
+
+        <div class="cart-layout">
+
+
+            <!-- =================================
+                 DANH SÁCH SẢN PHẨM
+            ================================== -->
+
+            <div>
+
+                <div class="cart-list">
+
+                    {% for item in items %}
+
+                    <div class="cart-item">
+
+
+                        <!-- =================================
+                             ẢNH
+                        ================================== -->
+
+                        <div>
+
+                            {% if item.pizza.image %}
+
+                                <img
+                                    src="{{ item.pizza.image.url }}"
+                                    alt="{{ item.pizza.name }}"
+                                    class="cart-image"
+                                >
+
+                            {% else %}
+
+                                <div class="cart-no-image">
+                                    🍕
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- =================================
+                             THÔNG TIN
+                        ================================== -->
+
+                        <div>
+
+                            <h3 class="cart-product-name">
+                                {{ item.pizza.name }}
+                            </h3>
+
+                            <p class="cart-product-description">
+                                {{ item.pizza.description|truncatewords:15 }}
+                            </p>
+
+                            <div class="cart-product-price">
+                                {{ item.pizza.price|floatformat:0 }} ₫
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================
+                             SỐ LƯỢNG
+                        ================================== -->
+
+                        <div>
+
+                            <div class="quantity-box">
+
+                                <a
+                                    href="{% url 'decrease_quantity' item.pizza.id %}"
+                                    class="quantity-btn"
+                                >
+                                    −
+                                </a>
+
+                                <span class="quantity-number">
+                                    {{ item.quantity }}
+                                </span>
+
+                                <a
+                                    href="{% url 'increase_quantity' item.pizza.id %}"
+                                    class="quantity-btn"
+                                >
+                                    +
+                                </a>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================
+                             THÀNH TIỀN
+                        ================================== -->
+
+                        <div class="cart-subtotal">
+
+                            <div class="cart-subtotal-price">
+                                {{ item.subtotal|floatformat:0 }} ₫
+                            </div>
+
+                            <a
+                                href="{% url 'remove_from_cart' item.pizza.id %}"
+                                class="delete-btn"
+                                onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?');"
+                            >
+                                🗑 Xóa
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- =================================
+                     TIẾP TỤC CHỌN MÓN
+                ================================== -->
+
+                <a
+                    href="{% url 'home' %}"
+                    class="continue-shopping"
+                >
+                    ← Tiếp tục chọn món
+                </a>
+
+            </div>
+
+
+            <!-- =================================
+                 TÓM TẮT ĐƠN HÀNG
+            ================================== -->
+
+            <div class="order-summary">
+
+                <h2 class="summary-title">
+                    Tóm tắt đơn hàng
+                </h2>
+
+
+                <!-- TẠM TÍNH -->
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Tạm tính
+                    </span>
+
+                    <span class="summary-value">
+                        {{ total|floatformat:0 }} ₫
+                    </span>
+
+                </div>
+
+
+                <!-- PHÍ GIAO HÀNG -->
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Phí giao hàng
+                    </span>
+
+                    <span class="summary-free">
+                        Miễn phí
+                    </span>
+
+                </div>
+
+
+                <hr class="summary-divider">
+
+
+                <!-- TỔNG -->
+
+                <div class="summary-total">
+
+                    <span class="summary-total-label">
+                        Tổng cộng
+                    </span>
+
+                    <span class="summary-total-price">
+                        {{ total|floatformat:0 }} ₫
+                    </span>
+
+                </div>
+
+
+                <!-- =================================
+                     CHECKOUT
+                ================================== -->
+
+                {% if user.is_authenticated %}
+
+                    <a
+                        href="{% url 'checkout' %}"
+                        class="checkout-btn"
+                    >
+                        Tiến hành đặt hàng&nbsp; →
+                    </a>
+
+                {% else %}
+
+                    <a
+                        href="{% url 'login' %}?next={% url 'checkout' %}"
+                        class="checkout-btn"
+                    >
+                        Đăng nhập để đặt hàng
+                    </a>
+
+                    <p class="login-note">
+                        Bạn cần đăng nhập để tiếp tục đặt hàng.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        {% else %}
+
+
+        <!-- =================================
+             GIỎ HÀNG TRỐNG
+        ================================== -->
+
+        <div class="empty-cart">
+
+            <div class="empty-cart-icon">
+                🛒
+            </div>
+
+            <h2>
+                Giỏ hàng đang trống
+            </h2>
+
+            <p>
+                Bạn chưa có sản phẩm nào trong giỏ hàng.
+                Hãy chọn một chiếc Pizza thật ngon nhé!
+            </p>
+
+            <a
+                href="{% url 'home' %}"
+                class="menu-btn"
+            >
+                🍕 Xem thực đơn
+            </a>
+
+        </div>
+
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

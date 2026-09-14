@@ -1,0 +1,47 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+
+    {% if delete_all_count > 0 %}
+        <li>
+            <form method="post"
+                  action=""
+                  onsubmit="return confirmDeleteAll();"
+                  style="display:inline;">
+
+                {% csrf_token %}
+
+                <input type="hidden"
+                       name="_delete_all"
+                       value="1">
+
+                <button type="submit"
+                        class="button"
+                        style="background:#ba2121;
+                               border-color:#ba2121;
+                               color:#fff;
+                               font-weight:600;">
+                    🗑 Xóa tất cả
+                </button>
+
+            </form>
+        </li>
+    {% endif %}
+{% endblock %}
+
+
+{% block extrahead %}
+    {{ block.super }}
+
+    <script>
+        function confirmDeleteAll() {
+            return confirm(
+                "⚠️ CẢNH BÁO\n\n" +
+                "Bạn có chắc chắn muốn xóa TOÀN BỘ dữ liệu " +
+                "của bảng này không?\n\n" +
+                "Hành động này không thể hoàn tác."
+            );
+        }
+    </script>
+{% endblock %}

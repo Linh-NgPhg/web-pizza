@@ -1,0 +1,887 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+Đặt hàng - Pizza House
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================
+   CHECKOUT PAGE
+========================================= */
+
+.checkout-page {
+    min-height: 80vh;
+    padding: 50px 0 70px;
+    background: #fafafa;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.checkout-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.checkout-header h1 {
+    margin: 0;
+    font-size: 36px;
+    font-weight: 800;
+    color: #222;
+}
+
+.checkout-header h1 span {
+    color: #e53935;
+}
+
+.checkout-header p {
+    margin-top: 10px;
+    color: #777;
+    font-size: 16px;
+}
+
+/* =========================================
+   LAYOUT
+========================================= */
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+    gap: 28px;
+    align-items: start;
+}
+
+/* =========================================
+   CARD
+========================================= */
+
+.checkout-card {
+    background: #fff;
+    border: 1px solid #eeeeee;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================
+   CARD TITLE
+========================================= */
+
+.checkout-card-title {
+    margin: 0 0 25px;
+    font-size: 21px;
+    font-weight: 800;
+    color: #222;
+}
+
+.checkout-card-title span {
+    margin-right: 7px;
+}
+
+/* =========================================
+   SAVED PROFILE INFO
+========================================= */
+
+.saved-info-box {
+    background: #fff7f2;
+    border: 1px solid #ffd8c2;
+    border-radius: 14px;
+    padding: 15px 18px;
+    margin-bottom: 22px;
+}
+
+.saved-info-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    width: fit-content;
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+}
+
+.saved-info-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    accent-color: #e53935;
+    flex-shrink: 0;
+}
+
+.saved-info-label span {
+    line-height: 18px;
+}
+
+.saved-info-description {
+    margin: 8px 0 0 28px;
+    color: #777;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Khi đang dùng thông tin tài khoản */
+
+.profile-readonly {
+    background-color: #f5f5f5 !important;
+    color: #666 !important;
+    cursor: not-allowed;
+}
+
+/* =========================================
+   FORM
+========================================= */
+
+.checkout-form p {
+    margin: 0 0 18px;
+}
+
+.checkout-form label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+}
+
+.checkout-form input,
+.checkout-form select,
+.checkout-form textarea {
+    width: 100%;
+    padding: 13px 15px;
+    border: 1px solid #dddddd;
+    border-radius: 11px;
+    background: #fff;
+    color: #333;
+    font-size: 15px;
+    outline: none;
+    box-sizing: border-box;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.checkout-form input:focus,
+.checkout-form select:focus,
+.checkout-form textarea:focus {
+    border-color: #e53935;
+    box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.10);
+}
+
+.checkout-form textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.checkout-form ul.errorlist {
+    margin: 5px 0 7px;
+    padding: 0;
+    list-style: none;
+    color: #e53935;
+    font-size: 13px;
+}
+
+/* =========================================
+   FORM ERRORS
+========================================= */
+
+.checkout-form-errors {
+    margin-bottom: 18px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    background: #fff1f1;
+    border: 1px solid #ffcaca;
+    color: #e53935;
+    font-size: 13px;
+}
+
+/* =========================================
+   DJANGO FORM HELP TEXT
+========================================= */
+
+.checkout-form .helptext {
+    display: block;
+    margin-top: 5px;
+    color: #999;
+    font-size: 12px;
+}
+
+/* =========================================
+   ORDER ITEMS
+========================================= */
+
+.order-items {
+    margin-bottom: 25px;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.order-item:first-child {
+    padding-top: 0;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+/* =========================================
+   PRODUCT IMAGE
+========================================= */
+
+.order-item-image {
+    width: 70px;
+    height: 65px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 11px;
+}
+
+.order-item-no-image {
+    width: 70px;
+    height: 65px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: #fff3e0;
+    font-size: 28px;
+}
+
+/* =========================================
+   PRODUCT INFO
+========================================= */
+
+.order-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.order-item-name {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 750;
+    color: #222;
+}
+
+.order-item-quantity {
+    margin: 0;
+    color: #888;
+    font-size: 13px;
+}
+
+.order-item-price {
+    flex-shrink: 0;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 800;
+    color: #e53935;
+}
+
+/* =========================================
+   SUMMARY
+========================================= */
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 15px;
+}
+
+.summary-label {
+    color: #777;
+}
+
+.summary-value {
+    color: #333;
+    font-weight: 700;
+}
+
+.summary-free {
+    color: #28a745;
+    font-weight: 700;
+}
+
+.summary-divider {
+    height: 1px;
+    border: none;
+    background: #eeeeee;
+    margin: 22px 0;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.summary-total-label {
+    font-size: 18px;
+    font-weight: 800;
+    color: #222;
+}
+
+.summary-total-price {
+    font-size: 25px;
+    font-weight: 850;
+    color: #e53935;
+}
+
+/* =========================================
+   PLACE ORDER BUTTON
+========================================= */
+
+.place-order-btn {
+    width: 100%;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 13px;
+    background: #e53935;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(229, 57, 53, 0.25);
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.place-order-btn:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 9px 22px rgba(229, 57, 53, 0.32);
+}
+
+/* =========================================
+   BACK TO CART
+========================================= */
+
+.back-cart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 18px;
+    padding: 11px 18px;
+    border: 1px solid #e53935;
+    border-radius: 11px;
+    background: #fff;
+    color: #e53935;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.back-cart-btn:hover {
+    background: #e53935;
+    color: #fff;
+}
+
+/* =========================================
+   SECURITY NOTE
+========================================= */
+
+.checkout-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    color: #888;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* =========================================
+   REQUIRED / ERRORS
+========================================= */
+
+.checkout-form .errorlist {
+    color: #e53935;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .checkout-layout {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .checkout-page {
+        padding: 35px 15px 50px;
+    }
+
+    .checkout-header {
+        margin-bottom: 30px;
+    }
+
+    .checkout-header h1 {
+        font-size: 29px;
+    }
+
+    .checkout-card {
+        padding: 21px;
+        border-radius: 17px;
+    }
+
+    .order-item-image,
+    .order-item-no-image {
+        width: 58px;
+        height: 58px;
+    }
+
+    .order-item-no-image {
+        font-size: 24px;
+    }
+
+    .order-item-name {
+        font-size: 14px;
+    }
+
+    .order-item-price {
+        font-size: 14px;
+    }
+
+    .summary-total-price {
+        font-size: 22px;
+    }
+
+}
+
+</style>
+
+
+<div class="checkout-page">
+
+    <div class="container">
+
+        <!-- =================================
+             HEADER
+        ================================== -->
+
+        <div class="checkout-header">
+
+            <h1>
+                🛍️ <span>Xác nhận đặt hàng</span>
+            </h1>
+
+            <p>
+                Kiểm tra thông tin và xác nhận đơn hàng của bạn
+            </p>
+
+        </div>
+
+
+        <!-- =================================
+             MAIN LAYOUT
+        ================================== -->
+
+        <div class="checkout-layout">
+
+
+            <!-- =================================
+                 THÔNG TIN KHÁCH HÀNG
+            ================================== -->
+
+            <div>
+
+                <div class="checkout-card">
+
+                    <h2 class="checkout-card-title">
+
+                        <span>📋</span>
+                        Thông tin nhận hàng
+
+                    </h2>
+
+
+                    <form
+                        method="POST"
+                        class="checkout-form"
+                    >
+
+                        {% csrf_token %}
+
+
+                        {% if form.non_field_errors %}
+
+                            <div class="checkout-form-errors">
+                                {{ form.non_field_errors }}
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- =================================
+                             DÙNG THÔNG TIN TÀI KHOẢN
+                        ================================== -->
+
+                        <div class="saved-info-box">
+
+                            <label class="saved-info-label">
+
+                                <input
+                                    type="checkbox"
+                                    name="use_profile"
+                                    value="1"
+                                    id="use-profile"
+                                    {% if use_profile %}checked{% endif %}
+                                >
+
+                                <span>
+                                    📋 Dùng thông tin tài khoản của tôi
+                                </span>
+
+                            </label>
+
+                            <p class="saved-info-description">
+                                Tự động sử dụng họ tên, số điện thoại và địa chỉ
+                                đã lưu trong tài khoản.
+                            </p>
+
+                        </div>
+
+
+                        <!-- =================================
+                             FORM DJANGO
+                        ================================== -->
+
+                        {{ form.as_p }}
+
+
+                        <!-- =================================
+                             NÚT ĐẶT HÀNG
+                        ================================== -->
+
+                        <button
+                            type="submit"
+                            class="place-order-btn"
+                        >
+                            Xác nhận đặt hàng&nbsp; →
+                        </button>
+
+
+                        <div class="checkout-note">
+                            🔒 Thông tin của bạn được sử dụng để giao đơn hàng.
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <!-- =================================
+                     QUAY LẠI GIỎ HÀNG
+                ================================== -->
+
+                <a
+                    href="{% url 'cart' %}"
+                    class="back-cart-btn"
+                >
+                    ← Quay lại giỏ hàng
+                </a>
+
+            </div>
+
+
+            <!-- =================================
+                 TÓM TẮT ĐƠN HÀNG
+            ================================== -->
+
+            <div>
+
+                <div class="checkout-card">
+
+                    <h2 class="checkout-card-title">
+
+                        <span>🛒</span>
+                        Đơn hàng của bạn
+
+                    </h2>
+
+
+                    <!-- =================================
+                         DANH SÁCH SẢN PHẨM
+                    ================================== -->
+
+                    <div class="order-items">
+
+                        {% for item in items %}
+
+                            <div class="order-item">
+
+
+                                <!-- ẢNH -->
+
+                                {% if item.pizza.image %}
+
+                                    <img
+                                        src="{{ item.pizza.image.url }}"
+                                        alt="{{ item.pizza.name }}"
+                                        class="order-item-image"
+                                    >
+
+                                {% else %}
+
+                                    <div class="order-item-no-image">
+                                        🍕
+                                    </div>
+
+                                {% endif %}
+
+
+                                <!-- THÔNG TIN -->
+
+                                <div class="order-item-info">
+
+                                    <p class="order-item-name">
+                                        {{ item.pizza.name }}
+                                    </p>
+
+                                    <p class="order-item-quantity">
+                                        Số lượng: {{ item.quantity }}
+                                    </p>
+
+                                </div>
+
+
+                                <!-- THÀNH TIỀN -->
+
+                                <div class="order-item-price">
+                                    {{ item.subtotal|floatformat:0 }} ₫
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================
+                         TẠM TÍNH
+                    ================================== -->
+
+                    <div class="summary-row">
+
+                        <span class="summary-label">
+                            Tạm tính
+                        </span>
+
+                        <span class="summary-value">
+                            {{ subtotal|floatformat:0 }} ₫
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================
+                         PHÍ GIAO HÀNG
+                    ================================== -->
+
+                    <div class="summary-row">
+
+                        <span class="summary-label">
+                            Phí giao hàng
+                        </span>
+
+                        <span class="summary-free">
+
+                            {% if shipping_fee == 0 %}
+                                Miễn phí
+                            {% else %}
+                                {{ shipping_fee|floatformat:0 }} ₫
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================
+                         MÃ GIẢM GIÁ (UC03)
+                    ================================== -->
+
+                    <div class="summary-row" style="flex-direction: column; align-items: stretch; gap: 8px;">
+
+                        {% if voucher %}
+
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+
+                                <span class="summary-label">
+                                    🏷️ Mã "{{ voucher.code }}" đã áp dụng
+                                </span>
+
+                                <form method="post" action="{% url 'remove_voucher' %}" style="margin:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="back-cart-btn" style="padding:4px 10px; font-size:13px;">
+                                        Gỡ mã
+                                    </button>
+                                </form>
+
+                            </div>
+
+                        {% else %}
+
+                            <form method="post" action="{% url 'apply_voucher' %}" style="display:flex; gap:8px; margin:0;">
+                                {% csrf_token %}
+                                <input
+                                    type="text"
+                                    name="voucher_code"
+                                    class="form-control"
+                                    placeholder="Nhập mã giảm giá"
+                                    style="flex:1;"
+                                >
+                                <button type="submit" class="place-order-btn" style="padding:8px 16px; width:auto;">
+                                    Áp dụng
+                                </button>
+                            </form>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- =================================
+                         GIẢM GIÁ
+                    ================================== -->
+
+                    {% if discount > 0 %}
+
+                        <div class="summary-row">
+
+                            <span class="summary-label">
+                                Giảm giá
+                            </span>
+
+                            <span class="summary-value">
+                                - {{ discount|floatformat:0 }} ₫
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <hr class="summary-divider">
+
+
+                    <!-- =================================
+                         TỔNG CỘNG
+                    ================================== -->
+
+                    <div class="summary-total">
+
+                        <span class="summary-total-label">
+                            Tổng cộng
+                        </span>
+
+                        <span class="summary-total-price">
+                            {{ total_price|floatformat:0 }} ₫
+                        </span>
+
+                    </div>
+
+
+                    <div class="checkout-note">
+                        🍕 Đơn hàng sẽ được xử lý sau khi bạn xác nhận.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     PROFILE TOGGLE SCRIPT
+========================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const checkbox = document.getElementById("use-profile");
+
+    const fullName = document.getElementById("id_full_name");
+    const phone = document.getElementById("id_phone");
+    const address = document.getElementById("id_address");
+
+    if (!checkbox || !fullName || !phone || !address) {
+        return;
+    }
+
+
+    function toggleProfileFields() {
+
+        if (checkbox.checked) {
+
+            fullName.readOnly = true;
+            phone.readOnly = true;
+            address.readOnly = true;
+
+            fullName.classList.add("profile-readonly");
+            phone.classList.add("profile-readonly");
+            address.classList.add("profile-readonly");
+
+        } else {
+
+            fullName.readOnly = false;
+            phone.readOnly = false;
+            address.readOnly = false;
+
+            fullName.classList.remove("profile-readonly");
+            phone.classList.remove("profile-readonly");
+            address.classList.remove("profile-readonly");
+
+        }
+
+    }
+
+
+    checkbox.addEventListener(
+        "change",
+        toggleProfileFields
+    );
+
+
+    // Chạy ngay khi trang được mở
+    // để checkbox mặc định hoạt động đúng.
+
+    toggleProfileFields();
+
+});
+
+</script>
+
+{% endblock %}

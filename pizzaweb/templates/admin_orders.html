@@ -1,0 +1,604 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản lý đơn hàng{% endblock %}
+
+{% block content %}
+
+<style>
+    .admin-orders-page {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px 60px;
+    }
+
+    .admin-orders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .admin-orders-header h1 {
+        margin: 0;
+        font-size: 28px;
+        color: #252525;
+    }
+
+    .admin-orders-header p {
+        margin: 7px 0 0;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .orders-count {
+        background: #fff1e8;
+        color: #e85d04;
+        padding: 9px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .order-card {
+        background: white;
+        border-radius: 18px;
+        margin-bottom: 16px;
+        padding: 22px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, .06);
+        border: 1px solid #f1f1f1;
+    }
+
+    .order-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 18px;
+    }
+
+    .order-id {
+        font-size: 19px;
+        font-weight: 800;
+        color: #252525;
+    }
+
+    .order-date {
+        margin-top: 5px;
+        font-size: 13px;
+        color: #888;
+    }
+
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+    .info-box {
+        background: #fafafa;
+        border-radius: 12px;
+        padding: 14px;
+    }
+
+    .info-label {
+        display: block;
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .total-price {
+        color: #e85d04;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .order-bottom {
+        border-top: 1px solid #eee;
+        padding-top: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .status-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .status-form label {
+        font-size: 13px;
+        color: #777;
+        font-weight: 600;
+    }
+
+    .status-form select {
+        height: 40px;
+        min-width: 180px;
+        padding: 0 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: white;
+        font-size: 14px;
+        outline: none;
+    }
+
+    .status-form select:focus {
+        border-color: #e85d04;
+    }
+
+    .toast-message {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    z-index: 9999;
+
+    min-width: 280px;
+    max-width: 380px;
+
+    padding: 14px 18px;
+    border-radius: 12px;
+
+    background: #ffffff;
+    color: #333;
+
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .15);
+    border-left: 4px solid #28a745;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    opacity: 0;
+    transform: translateY(20px);
+
+    animation: toastShow 0.3s ease forwards;
+}
+
+@keyframes toastShow {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.toast-message.hide {
+    animation: toastHide 0.3s ease forwards;
+}
+
+@keyframes toastHide {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+@media (max-width: 500px) {
+    .toast-message {
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+        min-width: auto;
+    }
+}
+
+    .update-btn {
+        height: 40px;
+        padding: 0 18px;
+        border: none;
+        border-radius: 10px;
+        background: #e85d04;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .update-btn:hover {
+        background: #d94f00;
+        transform: translateY(-1px);
+    }
+
+    .update-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .view-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        padding: 0 16px;
+        border-radius: 10px;
+        background: #f5f5f5;
+        color: #444;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .view-btn:hover {
+        background: #eaeaea;
+    }
+
+    .empty-orders {
+        background: white;
+        border-radius: 18px;
+        padding: 60px 20px;
+        text-align: center;
+        color: #888;
+    }
+
+    .empty-orders-icon {
+        font-size: 45px;
+        margin-bottom: 15px;
+    }
+
+    @media (max-width: 800px) {
+        .order-info {
+            grid-template-columns: 1fr;
+        }
+
+        .order-top,
+        .order-bottom {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .status-form {
+            flex-wrap: wrap;
+        }
+
+        .status-form select {
+            flex: 1;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .admin-orders-page {
+            margin-top: 25px;
+        }
+
+        .admin-orders-header {
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .admin-orders-header h1 {
+            font-size: 23px;
+        }
+
+        .status-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .status-form select,
+        .update-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="admin-orders-page">
+
+    <div class="admin-orders-header">
+
+        <div>
+            <h1>🧾 Quản lý đơn hàng</h1>
+            <p>
+                Theo dõi và cập nhật trạng thái đơn hàng
+            </p>
+        </div>
+
+        <div class="orders-count">
+            {{ orders|length }} đơn hàng
+        </div>
+
+    </div>
+
+
+
+
+    {% if orders %}
+
+        {% for order in orders %}
+
+            <div class="order-card">
+
+                <div class="order-top">
+
+                    <div>
+                        <div class="order-id">
+                            Đơn hàng #{{ order.id }}
+                        </div>
+
+                        <div class="order-date">
+                            {{ order.created_at|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="order-info">
+
+                    <div class="info-box">
+                        <span class="info-label">
+                            Khách hàng
+                        </span>
+
+                        <span class="info-value">
+                            {{ order.full_name }}
+                        </span>
+                    </div>
+
+
+                    <div class="info-box">
+                        <span class="info-label">
+                            Số điện thoại
+                        </span>
+
+                        <span class="info-value">
+                            {{ order.phone }}
+                        </span>
+                    </div>
+
+
+                    <div class="info-box">
+                        <span class="info-label">
+                            Tổng tiền
+                        </span>
+
+                        <span class="total-price">
+                            {{ order.total_price|floatformat:0 }} ₫
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="info-box" style="margin-bottom: 18px;">
+                    <span class="info-label">
+                        Địa chỉ giao hàng
+                    </span>
+
+                    <span class="info-value">
+                        {{ order.address }}
+                    </span>
+                </div>
+
+
+                <div class="order-bottom">
+
+                    <form
+                        method="POST"
+                        action="{% url 'manage_orders' %}"
+                        class="status-form"
+                    >
+                        {% csrf_token %}
+
+                        <input
+                            type="hidden"
+                            name="order_id"
+                            value="{{ order.id }}"
+                        >
+
+                        <label>
+                            Trạng thái:
+                        </label>
+
+
+                        <select name="status">
+
+                            {% if order.status == "ordered" %}
+
+                                <option value="ordered" selected>
+                                    Đã đặt hàng
+                                </option>
+
+                                <option value="confirmed">
+                                    Đã xác nhận
+                                </option>
+
+                                <option value="cancelled">
+                                    Đã hủy
+                                </option>
+
+                            {% elif order.status == "confirmed" %}
+
+                                <option value="confirmed" selected>
+                                    Đã xác nhận
+                                </option>
+
+                                <option value="preparing">
+                                    Đang chuẩn bị
+                                </option>
+
+                            {% elif order.status == "preparing" %}
+
+                                <option value="preparing" selected>
+                                    Đang chuẩn bị
+                                </option>
+
+                                <option value="shipping">
+                                    Đang giao
+                                </option>
+
+                            {% elif order.status == "shipping" %}
+
+                                <option value="shipping" selected>
+                                    Đang giao
+                                </option>
+
+                                <option value="completed">
+                                    Hoàn thành
+                                </option>
+
+                            {% elif order.status == "completed" %}
+
+                                <option value="completed" selected>
+                                    Hoàn thành
+                                </option>
+
+                            {% elif order.status == "cancelled" %}
+
+                                <option value="cancelled" selected>
+                                    Đã hủy
+                                </option>
+
+                            {% endif %}
+
+                        </select>
+
+
+                        {% if order.status != "completed" and order.status != "cancelled" %}
+
+                            <button
+                                type="submit"
+                                class="update-btn"
+                            >
+                                Cập nhật
+                            </button>
+
+                        {% endif %}
+
+                    </form>
+
+
+                    <a
+                        href="{% url 'order_detail' order.id %}"
+                        class="view-btn"
+                    >
+                        👁 Xem chi tiết
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-orders">
+
+            <div class="empty-orders-icon">
+                📦
+            </div>
+
+            <h3>
+                Chưa có đơn hàng
+            </h3>
+
+            <p>
+                Hiện tại chưa có đơn hàng nào trong hệ thống.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="toast-message" id="toast-message">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /*
+         * ==================================================
+         * KHÔI PHỤC VỊ TRÍ SCROLL SAU KHI CẬP NHẬT ĐƠN
+         * ==================================================
+         */
+
+        const savedScroll = sessionStorage.getItem("adminOrdersScroll");
+
+        if (savedScroll !== null) {
+
+            sessionStorage.removeItem("adminOrdersScroll");
+
+            // Khôi phục đúng vị trí cũ
+            window.scrollTo(
+                0,
+                parseInt(savedScroll, 10)
+            );
+        }
+
+
+        /*
+         * ==================================================
+         * LƯU VỊ TRÍ SCROLL TRƯỚC KHI SUBMIT
+         * ==================================================
+         */
+
+        const statusForms = document.querySelectorAll(".status-form");
+
+        statusForms.forEach(function (form) {
+
+            form.addEventListener("submit", function () {
+
+                sessionStorage.setItem(
+                    "adminOrdersScroll",
+                    window.scrollY
+                );
+
+            });
+
+        });
+
+
+        /*
+         * ==================================================
+         * POPUP THÔNG BÁO
+         * ==================================================
+         */
+
+        const toast = document.getElementById("toast-message");
+
+        if (toast) {
+
+            setTimeout(function () {
+
+                toast.classList.add("hide");
+
+                setTimeout(function () {
+                    toast.remove();
+                }, 300);
+
+            }, 2000);
+
+        }
+
+    });
+</script>
+
+{% endblock %}

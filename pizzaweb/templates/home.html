@@ -1,0 +1,502 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Pizza House - Pizza ngon mỗi ngày
+{% endblock %}
+
+{% block content %}
+
+<main>
+
+    <!-- ================================
+         HERO
+    ================================= -->
+
+    <section class="container">
+
+        <div class="hero">
+
+            <!-- HERO TEXT -->
+
+            <div class="hero-text">
+
+                <h1>
+                    Pizza ngon
+                    <span>mỗi ngày</span>
+                </h1>
+
+                <p>
+                    Pizza nóng hổi, phô mai béo ngậy,
+                    nguyên liệu tươi ngon và giao hàng
+                    tận nơi.
+                </p>
+
+                <a href="#menu" class="hero-btn">
+                    🍕 Đặt pizza ngay
+                </a>
+
+            </div>
+
+
+            <!-- HERO IMAGE
+                 Ảnh này là ảnh riêng,
+                 KHÔNG lấy từ Database
+            -->
+
+            <div class="hero-image-container">
+
+                <img
+                    class="hero-image"
+                    src="{% static 'images/hero-pizza.png' %}"
+                    alt="Pizza House"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================================
+         MENU PIZZA
+    ================================= -->
+
+    <section
+        class="section container"
+        id="menu"
+    >
+
+        <!-- TIÊU ĐỀ -->
+
+        <div class="section-title">
+
+            <h2>
+                🍕 Menu Pizza
+            </h2>
+
+            <p>
+                Chọn món pizza yêu thích của bạn
+            </p>
+
+        </div>
+
+
+        <!-- DANH SÁCH PIZZA -->
+
+        <div class="products">
+
+            {% for pizza in pizzas %}
+
+                <div
+                    class="product-card"
+                    style="display: flex; flex-direction: column; height: 100%;"
+                >
+
+
+                    <!-- ================================
+                         ẢNH PIZZA
+                         LẤY TỪ DATABASE / ADMIN
+                    ================================= -->
+
+                    {% if pizza.image %}
+
+                        <img
+                            class="product-image"
+                            src="{{ pizza.image.url }}"
+                            alt="{{ pizza.name }}"
+                        >
+
+                    {% else %}
+
+                        <!-- Nếu pizza chưa có ảnh -->
+
+                        <div class="product-image no-image">
+                            🍕
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- ================================
+                         THÔNG TIN PIZZA
+                    ================================= -->
+
+                    <div
+                        class="product-info"
+                        style="display: flex; flex-direction: column; flex-grow: 1;"
+                    >
+
+                        <!-- Cố định chiều cao tiêu đề tương đương 2 dòng để chú thích bên dưới luôn ngang hàng -->
+
+                        <h3
+                            style="min-height: 2.8em; line-height: 1.4; margin-bottom: 8px;"
+                        >
+                            {{ pizza.name }}
+                        </h3>
+
+
+                        <!-- Cố định chiều cao chú thích tương đương 3 dòng để hàng giá/nút luôn ngang hàng -->
+
+                        <p
+                            style="min-height: 4.2em; line-height: 1.4; margin-bottom: 16px;"
+                        >
+                            {{ pizza.description }}
+                        </p>
+
+
+                        <!-- ================================
+                             GIÁ + THÊM GIỎ
+                        ================================= -->
+
+                        <div
+                            class="product-bottom"
+                            style="margin-top: auto; display: flex; align-items: center; justify-content: space-between;"
+                        >
+
+                            <span class="price">
+                                {{ pizza.price|floatformat:0 }}đ
+                            </span>
+
+
+                            <!-- ================================
+                                 NÚT THÊM GIỎ
+                                 Không chuyển sang trang Cart
+                            ================================= -->
+
+                            <button
+                                type="button"
+                                class="add-btn"
+                                data-pizza-id="{{ pizza.id }}"
+                            >
+                                + Thêm giỏ
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            {% empty %}
+
+                <!-- ================================
+                     KHÔNG CÓ PIZZA
+                ================================= -->
+
+                <p>
+                    Hiện chưa có pizza.
+                    Hãy vào Admin để thêm món.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ================================
+     JAVASCRIPT THÊM VÀO GIỎ HÀNG
+
+     Không chuyển sang trang Cart.
+================================= -->
+
+<style>
+    /* ================================
+       POPUP THÊM GIỎ HÀNG
+    ================================= */
+
+    .cart-toast {
+        position: fixed;
+        right: 25px;
+        bottom: 25px;
+
+        display: flex;
+        align-items: center;
+        gap: 14px;
+
+        min-width: 300px;
+        max-width: 380px;
+
+        padding: 16px 20px;
+
+        background: #ffffff;
+        border-radius: 14px;
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+
+        z-index: 9999;
+
+        transform: translateX(120%);
+        opacity: 0;
+
+        transition:
+            transform 0.35s ease,
+            opacity 0.35s ease;
+    }
+
+
+    .cart-toast.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+
+    /* ICON */
+
+    .cart-toast-icon {
+        width: 42px;
+        height: 42px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        background: #28a745;
+        color: white;
+
+        border-radius: 50%;
+
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+
+    /* NỘI DUNG */
+
+    .cart-toast-content {
+        flex: 1;
+    }
+
+
+    .cart-toast-title {
+        margin: 0 0 4px;
+
+        font-size: 16px;
+        font-weight: 700;
+
+        color: #222;
+    }
+
+
+    .cart-toast-message {
+        margin: 0;
+
+        font-size: 14px;
+
+        color: #666;
+
+        line-height: 1.4;
+    }
+
+
+    /* NÚT ĐÓNG */
+
+    .cart-toast-close {
+        border: none;
+        background: transparent;
+
+        color: #999;
+
+        font-size: 20px;
+
+        cursor: pointer;
+
+        padding: 2px 4px;
+
+        transition: color 0.2s ease;
+    }
+
+
+    .cart-toast-close:hover {
+        color: #333;
+    }
+
+
+    /* MOBILE */
+
+    @media (max-width: 600px) {
+
+        .cart-toast {
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+
+            min-width: auto;
+            max-width: none;
+        }
+
+    }
+</style>
+
+
+<script>
+
+let toastTimer;
+
+
+/* ================================
+   HIỆN POPUP
+================================= */
+
+function showCartToast(message) {
+
+    /* Nếu popup cũ đang tồn tại thì xóa */
+
+    const oldToast = document.querySelector(".cart-toast");
+
+    if (oldToast) {
+        oldToast.remove();
+    }
+
+
+    /* Tạo popup */
+
+    const toast = document.createElement("div");
+
+    toast.className = "cart-toast";
+
+
+    toast.innerHTML = `
+        <div class="cart-toast-icon">
+            ✓
+        </div>
+
+        <div class="cart-toast-content">
+
+            <p class="cart-toast-title">
+                Thêm vào giỏ hàng
+            </p>
+
+            <p class="cart-toast-message">
+                ${message}
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            class="cart-toast-close"
+            onclick="closeCartToast()"
+        >
+            ×
+        </button>
+    `;
+
+
+    document.body.appendChild(toast);
+
+
+    /* Hiện popup */
+
+    setTimeout(function() {
+        toast.classList.add("show");
+    }, 10);
+
+
+    /* Tự động đóng sau 2.5 giây */
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(function() {
+        closeCartToast();
+    }, 2500);
+
+}
+
+
+/* ================================
+   ĐÓNG POPUP
+================================= */
+
+function closeCartToast() {
+
+    const toast = document.querySelector(".cart-toast");
+
+    if (!toast) {
+        return;
+    }
+
+
+    toast.classList.remove("show");
+
+
+    setTimeout(function() {
+
+        if (toast) {
+            toast.remove();
+        }
+
+    }, 350);
+
+}
+
+
+/* ================================
+   THÊM PIZZA VÀO GIỎ
+================================= */
+
+document.querySelectorAll(".add-btn").forEach(function(button) {
+
+    button.addEventListener("click", function() {
+
+        const pizzaId = this.dataset.pizzaId;
+
+
+        fetch(`/add-to-cart/${pizzaId}/`)
+            .then(function(response) {
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Không thể thêm sản phẩm vào giỏ hàng."
+                    );
+                }
+
+                return response.json();
+
+            })
+
+
+            .then(function(data) {
+
+                if (data.success) {
+
+                    showCartToast(
+                        data.message
+                    );
+
+                } else {
+
+                    showCartToast(
+                        "Không thể thêm món vào giỏ hàng."
+                    );
+
+                }
+
+            })
+
+
+            .catch(function(error) {
+
+                console.error(error);
+
+                showCartToast(
+                    "Không thể thêm món vào giỏ hàng."
+                );
+
+            });
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

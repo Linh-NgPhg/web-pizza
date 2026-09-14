@@ -1,0 +1,1285 @@
+{% extends 'base.html' %}
+
+{% block title %}Chi tiết đơn hàng #{{ order.id }} - Pizza House{% endblock %}
+
+{% block content %}
+
+<style>
+    .detail-page {
+        min-height: calc(100vh - 100px);
+        padding: 45px 20px 80px;
+        background: linear-gradient(
+            135deg,
+            #fff8f3 0%,
+            #ffffff 55%,
+            #fff3e8 100%
+        );
+    }
+
+    .detail-container {
+        max-width: 1050px;
+        margin: 0 auto;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: #777;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 22px;
+        transition: .2s;
+    }
+
+    .back-link:hover {
+        color: #e85d04;
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .detail-title h1 {
+        margin: 0 0 7px;
+        font-size: 30px;
+        font-weight: 800;
+        color: #252525;
+    }
+
+    .detail-title p {
+        margin: 0;
+        color: #888;
+        font-size: 14px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 16px;
+        border-radius: 25px;
+        background: #fff3e8;
+        color: #e85d04;
+        font-weight: 700;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .card {
+        background: #fff;
+        border: 1px solid #eee5df;
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #252525;
+        margin-bottom: 22px;
+    }
+
+    /* STATUS */
+
+    .tracking {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        padding: 10px 0 5px;
+    }
+
+    .tracking::before {
+        content: "";
+        position: absolute;
+        top: 25px;
+        left: 8%;
+        right: 8%;
+        height: 4px;
+        background: #eeeeee;
+        border-radius: 10px;
+        z-index: 0;
+    }
+
+    .tracking-progress {
+    position: absolute;
+    top: 25px;
+    left: 8%;
+    height: 4px;
+    background: #e85d04;
+    border-radius: 10px;
+    z-index: 1;
+    transition: .3s;
+    }
+
+    .progress-ordered {
+    width: 0%;
+    }
+
+    .progress-confirmed {
+    width: 21%;
+    }
+
+    .progress-preparing {
+    width: 42%;
+    }
+
+    .progress-shipping {
+    width: 63%;
+    }
+
+    .progress-completed {
+    width: 84%;
+    }
+
+    .step {
+        position: relative;
+        z-index: 2;
+        width: 20%;
+        text-align: center;
+    }
+
+    .step-icon {
+        width: 34px;
+        height: 34px;
+        margin: 0 auto 10px;
+        border-radius: 50%;
+        background: #eeeeee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+    }
+
+    .step.active .step-icon {
+        background: #e85d04;
+        color: white;
+    }
+
+    .step.current .step-icon {
+        box-shadow: 0 0 0 5px #fff0e5;
+    }
+
+    .step-label {
+        font-size: 12px;
+        color: #999;
+        font-weight: 600;
+    }
+
+    .step.active .step-label {
+        color: #e85d04;
+    }
+
+    /* PRODUCTS */
+
+    .product-row {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .product-row:last-child {
+        border-bottom: none;
+    }
+
+    .product-image {
+        width: 65px;
+        height: 65px;
+        border-radius: 13px;
+        object-fit: cover;
+        background: #f7f7f7;
+    }
+
+    .product-info {
+        flex: 1;
+    }
+
+    .product-name {
+        font-weight: 800;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .product-quantity {
+        color: #888;
+        font-size: 13px;
+    }
+
+    .product-price {
+        color: #e85d04;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    /* SUMMARY */
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 7px 0;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .summary-row.total {
+        margin-top: 12px;
+        padding-top: 17px;
+        border-top: 1px solid #eeeeee;
+        color: #252525;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .summary-row.total span:last-child {
+        color: #e85d04;
+        font-size: 22px;
+    }
+
+    /* INFORMATION */
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .info-box {
+        background: #fafafa;
+        border-radius: 13px;
+        padding: 16px;
+    }
+
+    .info-label {
+        color: #999;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .info-value {
+        color: #333;
+        font-size: 14px;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+    .note-box {
+        margin-top: 15px;
+        background: #fff8f3;
+        border: 1px solid #ffe4d2;
+        border-radius: 13px;
+        padding: 15px;
+    }
+
+    .note-title {
+        color: #e85d04;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .note-text {
+        color: #555;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .bottom-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .cancel-btn {
+    background: #fff;
+    color: #dc3545;
+    border: 1px solid #f1b8be;
+    cursor: pointer;
+}
+
+.cancel-btn:hover {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+/* CANCEL BUTTON */
+
+.cancel-btn {
+    background: #fff;
+    color: #dc3545;
+    border: 1px solid #f1b8be;
+    cursor: pointer;
+}
+
+.cancel-btn:hover {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+
+/* CANCEL MODAL */
+
+.cancel-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 9999;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.cancel-modal.show {
+    display: flex;
+}
+
+.cancel-modal-box {
+    width: 100%;
+    max-width: 430px;
+    background: #fff;
+    border-radius: 22px;
+    padding: 32px;
+    text-align: center;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+
+    animation: cancelModalShow .2s ease;
+}
+
+@keyframes cancelModalShow {
+    from {
+        opacity: 0;
+        transform: scale(.92) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.cancel-modal-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #fff1f2;
+    color: #dc3545;
+
+    font-size: 30px;
+}
+
+.cancel-modal-title {
+    margin: 0 0 10px;
+
+    color: #252525;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.cancel-modal-text {
+    margin: 0 auto 25px;
+
+    color: #777;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.cancel-modal-order {
+    color: #e85d04;
+    font-weight: 800;
+}
+
+.cancel-modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.cancel-modal-actions button {
+    flex: 1;
+    height: 45px;
+
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: .2s;
+}
+
+.cancel-modal-back {
+    background: #f5f5f5;
+    color: #555;
+    border: none;
+}
+
+.cancel-modal-back:hover {
+    background: #e9e9e9;
+}
+
+.cancel-modal-confirm {
+    background: #dc3545;
+    color: white;
+    border: none;
+}
+
+.cancel-modal-confirm:hover {
+    background: #c82333;
+}
+
+/* =========================================================
+   REVIEW
+   ========================================================= */
+
+.review-section {
+    margin-top: 5px;
+    padding: 0 0 10px;
+}
+
+.review-box {
+    margin-top: 10px;
+    padding: 18px;
+    background: #fff8f3;
+    border: 1px solid #ffe1cf;
+    border-radius: 15px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.review-title {
+    color: #333;
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 7px;
+}
+
+.review-stars {
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.review-comment {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: #fff;
+    border-radius: 10px;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.review-date {
+    margin-top: 10px;
+    color: #999;
+    font-size: 12px;
+}
+
+.review-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.review-actions form {
+    margin: 0;
+}
+
+.review-edit-btn,
+.review-delete-btn,
+.review-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.review-edit-btn {
+    background: #fff;
+    color: #e85d04;
+    border: 1px solid #ffd0b5;
+}
+
+.review-edit-btn:hover {
+    background: #e85d04;
+    color: white;
+}
+
+.review-delete-btn {
+    background: #fff;
+    color: #dc3545;
+    border: 1px solid #f1b8be;
+}
+
+.review-delete-btn:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.review-empty {
+    margin-top: 10px;
+    padding: 18px;
+    background: #fafafa;
+    border-radius: 15px;
+    border: 1px dashed #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.review-empty-text {
+    color: #777;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.review-btn {
+    flex-shrink: 0;
+    background: #e85d04;
+    color: white;
+    border: none;
+}
+
+.review-btn:hover {
+    background: #d94f00;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.review-locked {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f5f5f5;
+    border-radius: 9px;
+    color: #888;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+@media (max-width: 700px) {
+
+    .review-empty {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .review-btn {
+        width: 100%;
+    }
+
+    .review-actions {
+        flex-direction: column;
+    }
+
+    .review-edit-btn,
+    .review-delete-btn {
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .cancel-modal-box {
+        padding: 25px 20px;
+    }
+
+    .cancel-modal-actions {
+        flex-direction: column;
+    }
+
+    .cancel-modal-actions button {
+        width: 100%;
+    }
+}
+
+.bottom-actions form {
+    margin: 0;
+}
+
+    .action-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 7px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        transition: .2s;
+    }
+
+    .primary-btn {
+        background: #e85d04;
+        color: white;
+    }
+
+    .primary-btn:hover {
+        background: #d94f00;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .secondary-btn {
+        background: #f5f5f5;
+        color: #555;
+    }
+
+    .secondary-btn:hover {
+        background: #eeeeee;
+        color: #333;
+    }
+
+    @media (max-width: 700px) {
+
+        .detail-page {
+            padding: 30px 15px 60px;
+        }
+
+        .detail-header {
+            flex-direction: column;
+        }
+
+        .detail-title h1 {
+            font-size: 25px;
+        }
+
+        .card {
+            padding: 18px;
+        }
+
+        .tracking {
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .step {
+            min-width: 90px;
+        }
+
+        .tracking::before,
+        .tracking-progress {
+            display: none;
+        }
+
+        .step-icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        .step-label {
+            font-size: 11px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .product-image {
+            width: 55px;
+            height: 55px;
+        }
+
+        .bottom-actions {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="detail-page">
+
+    <div class="detail-container">
+
+        <a href="{% url 'my_orders' %}" class="back-link">
+            ← Quay lại đơn hàng của tôi
+        </a>
+
+
+        <!-- HEADER -->
+
+        <div class="detail-header">
+
+            <div class="detail-title">
+
+                <h1>
+                    🧾 Đơn hàng #{{ order.id }}
+                </h1>
+
+                <p>
+                    Đặt ngày {{ order.created_at|date:"d/m/Y H:i" }}
+                </p>
+
+            </div>
+
+
+            <div class="status-badge">
+
+                {% if order.status == "ordered" %}
+                    🕐
+                {% elif order.status == "confirmed" %}
+                    ✓
+                {% elif order.status == "preparing" %}
+                    👨‍🍳
+                {% elif order.status == "shipping" %}
+                    🚚
+                {% elif order.status == "completed" %}
+                    🎉
+                {% elif order.status == "cancelled" %}
+                    ✕
+                {% endif %}
+
+                {{ order.get_status_display }}
+
+            </div>
+
+        </div>
+
+
+        <!-- TRACKING -->
+
+        <div class="card">
+
+            <div class="card-title">
+                🚚 Theo dõi đơn hàng
+            </div>
+
+
+            {% if order.status == "cancelled" %}
+
+                <div class="note-box">
+
+                    <div class="note-title">
+                        ✕ Đơn hàng đã bị hủy
+                    </div>
+
+                    <div class="note-text">
+                        Đơn hàng #{{ order.id }} đã được hủy.
+                    </div>
+
+                </div>
+
+            {% else %}
+
+
+                <div class="tracking">
+
+                    <div class="tracking-progress
+    {% if order.status == 'ordered' %}progress-ordered
+    {% elif order.status == 'confirmed' %}progress-confirmed
+    {% elif order.status == 'preparing' %}progress-preparing
+    {% elif order.status == 'shipping' %}progress-shipping
+    {% elif order.status == 'completed' %}progress-completed
+    {% endif %}">
+</div>
+
+
+                    <div class="step {% if order.status == 'ordered' or order.status == 'confirmed' or order.status == 'preparing' or order.status == 'shipping' or order.status == 'completed' %}active{% endif %} {% if order.status == 'ordered' %}current{% endif %}">
+                        <div class="step-icon">🕐</div>
+                        <div class="step-label">Đã đặt hàng</div>
+                    </div>
+
+
+                    <div class="step {% if order.status == 'confirmed' or order.status == 'preparing' or order.status == 'shipping' or order.status == 'completed' %}active{% endif %} {% if order.status == 'confirmed' %}current{% endif %}">
+                        <div class="step-icon">✓</div>
+                        <div class="step-label">Đã xác nhận</div>
+                    </div>
+
+
+                    <div class="step {% if order.status == 'preparing' or order.status == 'shipping' or order.status == 'completed' %}active{% endif %} {% if order.status == 'preparing' %}current{% endif %}">
+                        <div class="step-icon">👨‍🍳</div>
+                        <div class="step-label">Đang chuẩn bị</div>
+                    </div>
+
+
+                    <div class="step {% if order.status == 'shipping' or order.status == 'completed' %}active{% endif %} {% if order.status == 'shipping' %}current{% endif %}">
+                        <div class="step-icon">🚚</div>
+                        <div class="step-label">Đang giao</div>
+                    </div>
+
+
+                    <div class="step {% if order.status == 'completed' %}active{% endif %} {% if order.status == 'completed' %}current{% endif %}">
+                        <div class="step-icon">🎉</div>
+                        <div class="step-label">Hoàn thành</div>
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- PRODUCTS -->
+
+<div class="card">
+
+    <div class="card-title">
+        🍕 Sản phẩm trong đơn
+    </div>
+
+    {% for item in order.items.all %}
+
+        <div class="product-row">
+
+            {% if item.pizza.image %}
+
+                <img
+                    src="{{ item.pizza.image.url }}"
+                    alt="{{ item.pizza.name }}"
+                    class="product-image"
+                >
+
+            {% else %}
+
+                <div class="product-image"></div>
+
+            {% endif %}
+
+
+            <div class="product-info">
+
+                <div class="product-name">
+                    {{ item.pizza.name }}
+                </div>
+
+                <div class="product-quantity">
+                    {{ item.quantity }} ×
+                    {{ item.price|floatformat:0 }} ₫
+                </div>
+
+            </div>
+
+
+            <div class="product-price">
+                {{ item.subtotal|floatformat:0 }} ₫
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- REVIEW -->
+        <!-- ================================================= -->
+
+        {% if order.status == "completed" %}
+
+            <div class="review-section">
+
+                {% with reviews=item.reviews.all %}
+
+                    {% if reviews %}
+
+                        {% for review in reviews %}
+
+                            {% if not review.is_deleted %}
+
+                                <div class="review-box">
+
+                                    <div class="review-header">
+
+                                        <div>
+                                            <div class="review-title">
+                                                ⭐ Đánh giá của bạn
+                                            </div>
+
+                                            <div class="review-stars">
+                                                {% if review.rating >= 1 %}⭐{% endif %}
+                                                {% if review.rating >= 2 %}⭐{% endif %}
+                                                {% if review.rating >= 3 %}⭐{% endif %}
+                                                {% if review.rating >= 4 %}⭐{% endif %}
+                                                {% if review.rating >= 5 %}⭐{% endif %}
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                    {% if review.comment %}
+
+                                        <div class="review-comment">
+                                            "{{ review.comment }}"
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    <div class="review-date">
+                                        Đánh giá ngày
+                                        {{ review.created_at|date:"d/m/Y H:i" }}
+                                    </div>
+
+
+                                    {% if review.action_count == 0 %}
+
+                                        <div class="review-actions">
+
+                                            <a
+                                                href="{% url 'edit_review' review.id %}"
+                                                class="review-edit-btn"
+                                            >
+                                                ✏️ Sửa
+                                            </a>
+
+                                            <form
+                                                method="POST"
+                                                action="{% url 'delete_review' review.id %}"
+                                                onsubmit="return confirm('Bạn có chắc muốn xóa đánh giá này không?');"
+                                            >
+                                                {% csrf_token %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="review-delete-btn"
+                                                >
+                                                    🗑️ Xóa
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    {% else %}
+
+                                        <div class="review-locked">
+                                            🔒 Bạn đã sử dụng quyền sửa/xóa đánh giá này.
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="review-empty">
+
+                            <div class="review-empty-text">
+                                Bạn đã hoàn thành đơn hàng này.
+                                Hãy chia sẻ cảm nhận về Pizza nhé! 🍕
+                            </div>
+
+                            <a
+                                href="{% url 'create_review' item.id %}"
+                                class="review-btn"
+                            >
+                                ⭐ Đánh giá Pizza
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
+                {% endwith %}
+
+            </div>
+
+        {% endif %}
+
+
+    {% empty %}
+
+        <p style="color:#888;">
+            Không có sản phẩm trong đơn hàng.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+        <!-- SUMMARY -->
+
+        <div class="card">
+
+            <div class="card-title">
+                💰 Chi tiết thanh toán
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>Tạm tính</span>
+
+                <span>
+                    {{ order.subtotal|floatformat:0 }} ₫
+                </span>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>Phí giao hàng</span>
+
+                <span>
+                    {{ order.shipping_fee|floatformat:0 }} ₫
+                </span>
+
+            </div>
+
+
+            {% if order.discount > 0 %}
+
+                <div class="summary-row">
+
+                    <span>Giảm giá</span>
+
+                    <span>
+                        -{{ order.discount|floatformat:0 }} ₫
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="summary-row total">
+
+                <span>Tổng cộng</span>
+
+                <span>
+                    {{ order.total_price|floatformat:0 }} ₫
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- CUSTOMER INFO -->
+
+        <div class="card">
+
+            <div class="card-title">
+                📍 Thông tin giao hàng
+            </div>
+
+
+            <div class="info-grid">
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        👤 Người nhận
+                    </div>
+
+                    <div class="info-value">
+                        {{ order.full_name }}
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        📞 Số điện thoại
+                    </div>
+
+                    <div class="info-value">
+                        {{ order.phone }}
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        📍 Địa chỉ
+                    </div>
+
+                    <div class="info-value">
+                        {{ order.address }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% if order.note %}
+
+                <div class="note-box">
+
+                    <div class="note-title">
+                        📝 Ghi chú
+                    </div>
+
+                    <div class="note-text">
+                        {{ order.note }}
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+<div class="bottom-actions">
+
+    {% if order.status == "ordered" %}
+<button
+    type="button"
+    class="action-btn cancel-btn"
+    onclick="openCancelModal()"
+>
+    ✕ Hủy đơn hàng
+</button>
+{% endif %}
+
+    <a
+        href="{% url 'my_orders' %}"
+        class="action-btn secondary-btn"
+    >
+        ← Đơn hàng của tôi
+    </a>
+
+    <a
+        href="{% url 'home' %}"
+        class="action-btn primary-btn"
+    >
+        🍕 Tiếp tục mua hàng
+    </a>
+
+</div>
+    </div>
+
+</div>
+
+<!-- CANCEL MODAL -->
+
+{% if order.status == "ordered" %}
+
+<div
+    id="cancelModal"
+    class="cancel-modal"
+    onclick="closeCancelModal(event)"
+>
+    <div
+        class="cancel-modal-box"
+        onclick="event.stopPropagation()"
+    >
+
+        <div class="cancel-modal-icon">
+            !
+        </div>
+
+        <h2 class="cancel-modal-title">
+            Hủy đơn hàng?
+        </h2>
+
+        <p class="cancel-modal-text">
+            Bạn có chắc chắn muốn hủy
+            <span class="cancel-modal-order">
+                đơn hàng #{{ order.id }}
+            </span>
+            không?<br>
+            Hành động này không thể hoàn tác.
+        </p>
+
+        <div class="cancel-modal-actions">
+
+            <button
+                type="button"
+                class="cancel-modal-back"
+                onclick="closeCancelModal()"
+            >
+                Không, quay lại
+            </button>
+
+            <form
+                method="POST"
+                action="{% url 'cancel_order' order.id %}"
+                style="flex: 1;"
+            >
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="cancel-modal-confirm"
+                    style="width: 100%;"
+                >
+                    Hủy đơn hàng
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+function openCancelModal() {
+    const modal = document.getElementById("cancelModal");
+
+    if (modal) {
+        modal.classList.add("show");
+        document.body.style.overflow = "hidden";
+    }
+}
+
+function closeCancelModal(event) {
+
+    if (event && event.target !== event.currentTarget) {
+        return;
+    }
+
+    const modal = document.getElementById("cancelModal");
+
+    if (modal) {
+        modal.classList.remove("show");
+        document.body.style.overflow = "";
+    }
+}
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "Escape") {
+        closeCancelModal();
+    }
+
+});
+
+</script>
+{% endif %}
+{% endblock %}

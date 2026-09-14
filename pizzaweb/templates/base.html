@@ -1,0 +1,1116 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Pizza House{% endblock %}</title>
+
+    <link rel="icon" href="data:,">
+
+
+    <!-- ==================================================
+         FONT TIẾNG VIỆT
+    =================================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+>
+
+    <style>
+
+        /* ==================================================
+           RESET
+        =================================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+            font-family:
+                "Be Vietnam Pro",
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #fff8f3;
+
+            color: #222;
+
+            line-height: 1.5;
+
+            min-height: 100vh;
+        }
+
+
+        button,
+        input,
+        textarea,
+        select {
+            font-family: inherit;
+        }
+
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+
+        /* ==================================================
+           HEADER
+        =================================================== */
+
+        .header {
+            background: rgba(255, 255, 255, 0.96);
+
+            border-bottom: 1px solid #eee;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1000;
+
+            backdrop-filter: blur(10px);
+        }
+
+
+        .navbar {
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding: 16px 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 25px;
+        }
+
+
+        /* ==================================================
+           LOGO
+        =================================================== */
+
+        .logo {
+            font-size: 27px;
+
+            font-weight: 800;
+
+            color: #d62828;
+
+            letter-spacing: -0.7px;
+
+            white-space: nowrap;
+
+            line-height: 1;
+
+            transition: 0.2s ease;
+        }
+
+
+        .logo:hover {
+            color: #b51f1f;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* ==================================================
+           NAVIGATION
+        =================================================== */
+
+        .nav-links {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: flex-end;
+
+            gap: 24px;
+
+            min-height: 40px;
+        }
+
+
+        .nav-links a {
+            position: relative;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            height: 40px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            color: #333;
+
+            white-space: nowrap;
+
+            line-height: 1;
+
+            transition: 0.2s ease;
+        }
+
+
+        .nav-links a:not(.cart-btn)::after {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: 3px;
+
+            width: 0;
+
+            height: 2px;
+
+            background: #d62828;
+
+            border-radius: 5px;
+
+            transition: width 0.2s ease;
+        }
+
+
+        .nav-links a:not(.cart-btn):hover {
+            color: #d62828;
+        }
+
+
+        .nav-links a:not(.cart-btn):hover::after {
+            width: 100%;
+        }
+
+
+        /* ==================================================
+           CART BUTTON
+        =================================================== */
+
+        .cart-btn {
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 6px;
+
+            height: 40px !important;
+
+            background: #d62828;
+
+            color: #fff !important;
+
+            padding: 0 17px;
+
+            border-radius: 25px;
+
+            font-size: 13px !important;
+
+            font-weight: 700 !important;
+
+            white-space: nowrap;
+
+            box-shadow:
+                0 5px 15px rgba(214, 40, 40, 0.18);
+
+            transition: all 0.25s ease;
+        }
+
+
+        .cart-btn:hover {
+            background: #b51f1f;
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 20px rgba(214, 40, 40, 0.25);
+        }
+
+
+        /* ==================================================
+           USER
+        =================================================== */
+
+        .nav-user {
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            height: 40px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            color: #555;
+
+            white-space: nowrap;
+
+            line-height: 1;
+        }
+
+
+        .nav-user strong {
+            color: #d62828;
+
+            margin-left: 5px;
+
+            font-weight: 700;
+        }
+
+
+        /* ==================================================
+           LOGOUT
+        =================================================== */
+
+        .logout-form {
+            display: inline-flex;
+
+            align-items: center;
+
+            height: 40px;
+
+            margin: 0;
+        }
+
+
+        .logout-btn {
+            border: none;
+
+            background: transparent;
+
+            color: #333;
+
+            cursor: pointer;
+
+            font-family: inherit;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            padding: 0;
+
+            height: 40px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            white-space: nowrap;
+
+            line-height: 1;
+
+            transition: 0.2s ease;
+        }
+
+
+        .logout-btn:hover {
+            color: #d62828;
+        }
+
+
+        /* ==================================================
+           MAIN CONTAINER
+        =================================================== */
+
+        .container {
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding: 0 20px;
+        }
+
+
+        /* ==================================================
+           HERO
+        =================================================== */
+
+        .hero {
+            min-height: 500px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 40px;
+
+            padding: 60px 0;
+        }
+
+
+        .hero-text {
+            max-width: 550px;
+        }
+
+
+        .hero-text h1 {
+            font-size: 58px;
+
+            line-height: 1.05;
+
+            font-weight: 800;
+
+            letter-spacing: -1.5px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .hero-text h1 span {
+            color: #d62828;
+        }
+
+
+        .hero-text p {
+            font-size: 18px;
+
+            color: #666;
+
+            line-height: 1.7;
+
+            margin-bottom: 30px;
+        }
+
+
+        .hero-btn {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            background: #d62828;
+
+            color: white;
+
+            padding: 14px 28px;
+
+            border-radius: 30px;
+
+            font-weight: 700;
+
+            font-size: 14px;
+
+            box-shadow:
+                0 7px 18px rgba(214, 40, 40, 0.2);
+
+            transition: 0.25s ease;
+        }
+
+
+        .hero-btn:hover {
+            background: #b51f1f;
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 25px rgba(214, 40, 40, 0.28);
+        }
+
+
+        .hero-image {
+            width: 500px;
+
+            height: 500px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.12);
+        }
+
+
+        /* ==================================================
+           SECTION
+        =================================================== */
+
+        .section {
+            padding: 70px 0;
+        }
+
+
+        .section-title {
+            text-align: center;
+
+            margin-bottom: 40px;
+        }
+
+
+        .section-title h2 {
+            font-size: 38px;
+
+            font-weight: 800;
+
+            letter-spacing: -0.7px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .section-title p {
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        /* ==================================================
+           PRODUCTS
+        =================================================== */
+
+        .products {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 28px;
+
+            align-items: stretch;
+        }
+
+
+        .product-card {
+            background: white;
+
+            border-radius: 18px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.08);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+
+            display: flex;
+
+            flex-direction: column;
+
+            height: 100%;
+        }
+
+
+        .product-card:hover {
+            transform: translateY(-7px);
+
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+
+        /* ==================================================
+           PRODUCT IMAGE
+        =================================================== */
+
+        .product-image {
+            width: 100%;
+
+            height: 230px;
+
+            object-fit: cover;
+        }
+
+
+        /* ==================================================
+           NO IMAGE
+        =================================================== */
+
+        .no-image {
+            height: 230px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #f5eee8;
+
+            font-size: 60px;
+
+            color: #d62828;
+        }
+
+
+        /* ==================================================
+           PRODUCT INFO
+        =================================================== */
+
+        .product-info {
+            padding: 22px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            flex: 1;
+        }
+
+
+        /* ==================================================
+           TÊN MÓN
+        =================================================== */
+
+        .product-info h3 {
+            font-size: 21px;
+
+            font-weight: 700;
+
+            margin-bottom: 10px;
+
+            line-height: 1.4;
+
+            min-height: 29px;
+        }
+
+
+        /* ==================================================
+           CHÚ THÍCH / MÔ TẢ MÓN
+        =================================================== */
+
+        .product-info p {
+            color: #777;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            margin: 0;
+
+            min-height: 62px;
+        }
+
+
+        /* ==================================================
+           GIÁ + THÊM GIỎ
+        =================================================== */
+
+        .product-bottom {
+            margin-top: auto;
+
+            padding-top: 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 10px;
+
+            min-height: 50px;
+        }
+
+
+        .price {
+            font-size: 19px;
+
+            font-weight: 800;
+
+            color: #d62828;
+
+            white-space: nowrap;
+
+            line-height: 1;
+        }
+
+
+        .add-btn {
+            background: #d62828;
+
+            color: white;
+
+            border: none;
+
+            padding: 10px 15px;
+
+            border-radius: 20px;
+
+            cursor: pointer;
+
+            font-family: inherit;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+
+            line-height: 1;
+
+            transition: 0.2s ease;
+        }
+
+
+        .add-btn:hover {
+            background: #b51f1f;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* ==================================================
+           MESSAGES
+        =================================================== */
+
+        .messages {
+            max-width: 1200px;
+
+            margin: 20px auto;
+
+            padding: 0 20px;
+        }
+
+
+        .message {
+            background: #e8f7e8;
+
+            color: #216b21;
+
+            padding: 14px 17px;
+
+            border-radius: 12px;
+
+            margin-bottom: 10px;
+
+            font-size: 13px;
+
+            border: 1px solid #c9e9c9;
+        }
+
+
+        /* ==================================================
+           FOOTER
+        =================================================== */
+
+        footer {
+            margin-top: 70px;
+
+            background: #1d1d1d;
+
+            color: white;
+
+            padding: 45px 20px;
+
+            text-align: center;
+        }
+
+
+        footer h2 {
+            font-size: 24px;
+
+            font-weight: 800;
+
+            margin-bottom: 8px;
+        }
+
+
+        footer p {
+            margin-top: 8px;
+
+            color: #bbb;
+
+            font-size: 13px;
+        }
+
+
+        /* ==================================================
+           LOGIN / REGISTER
+        =================================================== */
+
+        input,
+        textarea,
+        select {
+            outline: none;
+        }
+
+
+        /* ==================================================
+           RESPONSIVE - TABLET
+        =================================================== */
+
+        @media (max-width: 900px) {
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+
+            .hero {
+                flex-direction: column;
+
+                text-align: center;
+
+                padding: 50px 0;
+            }
+
+
+            .hero-text {
+                max-width: 650px;
+            }
+
+
+            .hero-image {
+                width: 350px;
+
+                height: 350px;
+            }
+
+
+            .products {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+
+        /* ==================================================
+           RESPONSIVE - MOBILE
+        =================================================== */
+
+        @media (max-width: 600px) {
+
+            .header {
+                position: relative;
+            }
+
+
+            .navbar {
+                flex-direction: column;
+
+                gap: 14px;
+
+                padding: 15px;
+            }
+
+
+            .logo {
+                font-size: 24px;
+            }
+
+
+            .nav-links {
+                width: 100%;
+
+                gap: 10px;
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+
+                min-height: auto;
+            }
+
+
+            .nav-links a,
+            .logout-btn,
+            .nav-user {
+                font-size: 12px;
+            }
+
+
+            .nav-links a,
+            .logout-btn,
+            .logout-form,
+            .nav-user {
+                height: 36px;
+            }
+
+
+            .cart-btn {
+                height: 36px !important;
+
+                padding: 0 13px;
+            }
+
+
+            .hero {
+                padding: 40px 0;
+            }
+
+
+            .hero-text h1 {
+                font-size: 42px;
+
+                letter-spacing: -1px;
+            }
+
+
+            .hero-text p {
+                font-size: 15px;
+            }
+
+
+            .hero-image {
+                width: 280px;
+
+                height: 280px;
+            }
+
+
+            .section {
+                padding: 50px 0;
+            }
+
+
+            .section-title h2 {
+                font-size: 30px;
+            }
+
+
+            .products {
+                grid-template-columns: 1fr;
+
+                gap: 20px;
+            }
+
+
+            .container {
+                padding: 0 15px;
+            }
+
+
+            footer {
+                margin-top: 50px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     HEADER
+=================================================== -->
+
+<header class="header">
+
+    <nav class="navbar">
+
+
+        <!-- LOGO -->
+
+        <a
+            href="{% url 'home' %}"
+            class="logo"
+        >
+            🍕 Pizza House
+        </a>
+
+
+        <!-- ==================================================
+             NAVIGATION
+        =================================================== -->
+
+        <div class="nav-links">
+
+
+            <!-- TRANG CHỦ -->
+
+            <a href="{% url 'home' %}">
+                Trang chủ
+            </a>
+
+
+            <!-- MENU -->
+
+            <a href="#menu">
+                Menu
+            </a>
+
+
+            <!-- GIỎ HÀNG -->
+
+            <a
+                href="{% url 'cart' %}"
+                class="cart-btn"
+            >
+                🛒 Giỏ hàng
+            </a>
+
+
+            <!-- ==================================================
+                 TÀI KHOẢN (TỰ ĐỘNG LẤY USERNAME)
+            =================================================== -->
+
+            {% if user.is_authenticated %}
+
+                <!-- HI + USERNAME -->
+
+                <a href="{% url 'my_orders' %}">
+                📋 Đơn hàng
+                </a>
+
+                {% if user.is_staff %}
+    <a href="{% url 'manage_orders' %}">
+        🧾 Quản lý đơn
+    </a>
+    <a href="{% url 'admin_dashboard' %}">
+        📊 Dashboard
+    </a>
+{% endif %}
+
+                <a href="{% url 'profile' %}" class="nav-user">
+                    👋 Hi, <strong>{{ user.username }}</strong>
+                </a>
+
+                <!-- ĐĂNG XUẤT -->
+
+                <form
+                    method="post"
+                    action="{% url 'logout' %}"
+                    class="logout-form"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="logout-btn"
+                    >
+                        Đăng xuất
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <!-- ĐĂNG NHẬP -->
+
+                <a href="{% url 'login' %}">
+                    Đăng nhập
+                </a>
+
+
+                <!-- ĐĂNG KÝ -->
+
+                <a href="{% url 'register' %}">
+                    Đăng ký
+                </a>
+
+            {% endif %}
+
+
+        </div>
+
+    </nav>
+
+</header>
+
+
+<!-- ==================================================
+     DJANGO MESSAGES
+=================================================== -->
+
+{% if messages and request.resolver_match.url_name != 'manage_orders' %}
+
+    <div class="messages">
+
+        {% for message in messages %}
+
+            <div class="message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% endif %}
+
+
+<!-- ==================================================
+     PAGE CONTENT
+=================================================== -->
+
+{% block content %}
+
+{% endblock %}
+
+
+<!-- ==================================================
+     FOOTER
+=================================================== -->
+
+<footer>
+
+    <h2>
+        🍕 Pizza House
+    </h2>
+
+
+    <p>
+        Pizza ngon - Giao hàng tận nơi
+    </p>
+
+
+    <p>
+        © 2026 Pizza House
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>

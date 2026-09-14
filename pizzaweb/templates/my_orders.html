@@ -1,0 +1,393 @@
+{% extends 'base.html' %}
+
+{% block title %}Đơn hàng của tôi - Pizza House{% endblock %}
+
+{% block content %}
+
+<style>
+    .orders-page {
+        min-height: calc(100vh - 100px);
+        padding: 55px 20px 80px;
+        background: linear-gradient(
+            135deg,
+            #fff8f3 0%,
+            #ffffff 55%,
+            #fff3e8 100%
+        );
+    }
+
+    .orders-container {
+        max-width: 1050px;
+        margin: 0 auto;
+    }
+
+    .orders-header {
+        margin-bottom: 30px;
+    }
+
+    .orders-header h1 {
+        font-size: 32px;
+        font-weight: 800;
+        color: #252525;
+        margin-bottom: 8px;
+    }
+
+    .orders-header p {
+        color: #777;
+        margin: 0;
+    }
+
+    .order-card {
+        background: #fff;
+        border: 1px solid #eee5df;
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 18px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .order-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .order-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .order-number {
+        font-size: 18px;
+        font-weight: 800;
+        color: #222;
+    }
+
+    .order-date {
+        color: #888;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 13px;
+        border-radius: 20px;
+        background: #fff3e8;
+        color: #e85d04;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .order-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 15px;
+        padding: 20px 0;
+    }
+
+    .info-box {
+        background: #fafafa;
+        border-radius: 13px;
+        padding: 15px;
+    }
+
+    .info-label {
+        color: #999;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        color: #333;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .order-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding-top: 18px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .total-label {
+        color: #777;
+        font-size: 13px;
+    }
+
+    .total-price {
+        color: #e85d04;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .detail-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 11px 18px;
+        border-radius: 11px;
+        background: #e85d04;
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+        transition: .2s;
+    }
+
+    .detail-btn:hover {
+        background: #d94f00;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .empty-orders {
+        background: #fff;
+        border-radius: 22px;
+        padding: 65px 25px;
+        text-align: center;
+        border: 1px solid #eee5df;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+    }
+
+    .empty-icon {
+        font-size: 70px;
+        margin-bottom: 20px;
+    }
+
+    .empty-orders h2 {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .empty-orders p {
+        color: #777;
+        margin-bottom: 25px;
+    }
+
+    .menu-btn {
+        display: inline-flex;
+        padding: 13px 22px;
+        background: #e85d04;
+        color: white;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+
+    .menu-btn:hover {
+        background: #d94f00;
+        color: white;
+    }
+
+    @media (max-width: 700px) {
+
+        .orders-page {
+            padding: 35px 15px 60px;
+        }
+
+        .orders-header h1 {
+            font-size: 27px;
+        }
+
+        .order-card {
+            padding: 18px;
+        }
+
+        .order-top {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .order-info {
+            grid-template-columns: 1fr;
+        }
+
+        .order-bottom {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .detail-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+
+<div class="orders-page">
+
+    <div class="orders-container">
+
+        <div class="orders-header">
+
+            <h1>
+                📋 Đơn hàng của tôi
+            </h1>
+
+            <p>
+                Theo dõi các đơn hàng bạn đã đặt tại Pizza House.
+            </p>
+
+        </div>
+
+
+        {% if orders %}
+
+            {% for order in orders %}
+
+                <div class="order-card">
+
+                    <div class="order-top">
+
+                        <div>
+
+                            <div class="order-number">
+                                🧾 Đơn hàng #{{ order.id }}
+                            </div>
+
+                            <div class="order-date">
+                                Đặt ngày
+                                {{ order.created_at|date:"d/m/Y H:i" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="status">
+
+                            {% if order.status == "ordered" %}
+                                🕐
+                            {% elif order.status == "confirmed" %}
+                                ✓
+                            {% elif order.status == "preparing" %}
+                                👨‍🍳
+                            {% elif order.status == "shipping" %}
+                                🚚
+                            {% elif order.status == "completed" %}
+                                🎉
+                            {% elif order.status == "cancelled" %}
+                                ✕
+                            {% endif %}
+
+                            {{ order.get_status_display }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="order-info">
+
+                        <div class="info-box">
+
+                            <div class="info-label">
+                                👤 Người nhận
+                            </div>
+
+                            <div class="info-value">
+                                {{ order.full_name }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="info-box">
+
+                            <div class="info-label">
+                                📞 Số điện thoại
+                            </div>
+
+                            <div class="info-value">
+                                {{ order.phone }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="info-box">
+
+                            <div class="info-label">
+                                📍 Địa chỉ
+                            </div>
+
+                            <div class="info-value">
+                                {{ order.address|truncatechars:45 }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="order-bottom">
+
+                        <div>
+
+                            <div class="total-label">
+                                Tổng thanh toán
+                            </div>
+
+                            <div class="total-price">
+                                {{ order.total_price|floatformat:0 }} ₫
+                            </div>
+
+                        </div>
+
+
+                        <a
+                            href="{% url 'order_detail' order.id %}"
+                            class="detail-btn"
+                        >
+                            👁 Xem chi tiết
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+
+        {% else %}
+
+            <div class="empty-orders">
+
+                <div class="empty-icon">
+                    🍕
+                </div>
+
+                <h2>
+                    Bạn chưa có đơn hàng nào
+                </h2>
+
+                <p>
+                    Hãy chọn một chiếc pizza thật ngon và đặt hàng ngay nhé!
+                </p>
+
+                <a
+                    href="{% url 'home' %}"
+                    class="menu-btn"
+                >
+                    🍕 Xem thực đơn
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
